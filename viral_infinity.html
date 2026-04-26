@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>⚡ VIRAL INFINITY - أقوى من تيك توك</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #ff0050;
+      --secondary: #00f7ef;
+      --tertiary: #ffd700;
+      --dark: #0a0e27;
+      --darker: #050812;
+      --card: rgba(20, 30, 60, 0.85);
+      --border: rgba(0, 247, 239, 0.2);
+      --text: #ffffff;
+      --text-dim: rgba(255,255,255,0.6);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body {
+      height: 100%; width: 100%; overflow: hidden;
+      font-family: 'Cairo', sans-serif;
+      background: #050812;
+      color: var(--text);
+      touch-action: manipulation;
+    }
+    #bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    
+    .container {
+      position: relative;
+      z-index: 2;
+      height: 100vh;
+      display: flex;
+    }
+    
+    #feed {
+      flex: 1;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    #feed::-webkit-scrollbar { display: none; }
+    
+    .video-card {
+      height: 100vh;
+      scroll-snap-align: start;
+      position: relative;
+      background: #000;
+      overflow: hidden;
+    }
+    
+    .video-wrapper {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .video-wrapper iframe,
+    .video-wrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .info-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 20px 16px 80px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.85));
+      z-index: 10;
+    }
+    
+    .actions {
+      position: absolute;
+      right: 16px;
+      bottom: 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 20;
+      align-items: center;
+    }
+    
+    .action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+      font-size: 1.1rem;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .action-btn:active { transform: scale(0.85); }
+    .action-btn .icon {
+      font-size: 2.2rem;
+      margin-bottom: 4px;
+      filter: drop-shadow(0 0 8px currentColor);
+    }
+    
+    .like-btn.liked .icon { color: #ff0050; animation: pop 0.3s; }
+    @keyframes pop { 0%,100% { transform: scale(1); } 50% { transform: scale(1.4); } }
+    
+    .source-selector {
+      position: absolute;
+      top: 20px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 6px;
+      display: flex;
+      gap: 6px;
+      z-index: 100;
+      box-shadow: 0 0 30px rgba(0,247,239,0.3);
+    }
+    .source-btn {
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .source-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 0 20px rgba(255,0,80,0.6);
+    }
+    
+    .double-tap-heart {
+      position: absolute;
+      font-size: 6rem;
+      color: #ff0050;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 30;
+      animation: doubleTapAnim 0.8s forwards;
+    }
+    @keyframes doubleTapAnim {
+      0% { transform: scale(0.5); opacity: 0; }
+      20% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+    
+    .loading {
+      position: fixed; inset: 0; background: rgba(5,8,18,0.95);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; flex-direction: column; gap: 15px;
+    }
+    .loader {
+      width: 60px; height: 60px;
+      border: 4px solid rgba(0,247,239,0.2);
+      border-top-color: var(--secondary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="loading" id="loading">
+  <div class="loader"></div>
+  <div style="color:var(--secondary); font-weight:700; letter-spacing:2px;">VIRAL INFINITY</div>
+</div>
+
+<div class="container">
+  <div class="source-selector" id="sourceSelector">
+    <div class="source-btn active" data-source="tiktok">TikTok</div>
+    <div class="source-btn" data-source="youtube">YouTube Shorts</div>
+    <div class="source-btn" data-source="reels">Reels</div>
+  </div>
+
+  <div id="feed"></div>
+</div>
+
+<script>
+// ================== CONFIG & STATE ==================
+let currentSource = 'tiktok';
+let currentIndex = 0;
+let videos = [];
+
+// Sample videos (يمكنك إضافة المزيد)
+const sampleVideos = {
+  tiktok: [
+    { id: "7432890123456789", platform: "tiktok", title: "تحدي الرقص الجديد 🔥", username: "@viral_ar" },
+    { id: "7421567890123456", platform: "tiktok", title: "ضحك حتى البكاء 😂", username: "@funnyegypt" },
+    { id: "7412345678901234", platform: "tiktok", title: "أجمل لحظات 2026", username: "@trending" },
+    { id: "7409876543210987", platform: "tiktok", title: "ترند جديد رهيب", username: "@egy_trends" }
+  ],
+  youtube: [
+    { id: "dQw4w9wgxcq", platform: "youtube", title: "Viral Short", username: "Shorts" },
+    { id: "3JZ_4J4Q6g0", platform: "youtube", title: "Funny Moment", username: "YouTube" }
+  ],
+  reels: [
+    { id: "example", platform: "reels", title: "Instagram Reel", username: "@instagram" }
+  ]
+};
+
+function createVideoCard(video) {
+  const card = document.createElement('div');
+  card.className = 'video-card';
+  card.dataset.index = videos.indexOf(video);
+
+  let embedHTML = '';
+  if (video.platform === 'tiktok') {
+    embedHTML = `<iframe src="https://www.tiktok.com/player/v1/${video.id}?autoplay=1&mute=0&loop=1" 
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+      allowfullscreen style="border:none; width:100%; height:100%;"></iframe>`;
+  } else if (video.platform === 'youtube') {
+    embedHTML = `<iframe src="https://www.youtube.com/embed/${video.id}?autoplay=1&modestbranding=1&playsinline=1" 
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  } else {
+    embedHTML = `<div style="color:white; text-align:center; padding-top:40vh;">Reels Embed قريباً</div>`;
+  }
+
+  card.innerHTML = `
+    <div class="video-wrapper">${embedHTML}</div>
+    <div class="info-overlay">
+      <div style="font-size:1.2rem; font-weight:700;">${video.title}</div>
+      <div style="color:var(--text-dim);">${video.username}</div>
+    </div>
+    <div class="actions">
+      <div class="action-btn like-btn" onclick="toggleLike(this)">
+        <div class="icon">❤️</div><span>إعجاب</span>
+      </div>
+      <div class="action-btn" onclick="comment()">
+        <div class="icon">💬</div><span>تعليق</span>
+      </div>
+      <div class="action-btn" onclick="share()">
+        <div class="icon">📤</div><span>مشاركة</span>
+      </div>
+      <div class="action-btn" onclick="saveVideo(this)">
+        <div class="icon">🔖</div><span>حفظ</span>
+      </div>
+    </div>
+  `;
+
+  // Double tap to like
+  let lastTap = 0;
+  card.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTap < 300) {
+      showDoubleTapHeart(e);
+      toggleLike(card.querySelector('.like-btn'));
+    }
+    lastTap = now;
+  });
+
+  return card;
+}
+
+function showDoubleTapHeart(e) {
+  const heart = document.createElement('div');
+  heart.className = 'double-tap-heart';
+  heart.textContent = '❤️';
+  heart.style.left = (e.changedTouches[0].clientX - 40) + 'px';
+  heart.style.top = (e.changedTouches[0].clientY - 100) + 'px';
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 800);
+}
+
+function toggleLike(btn) {
+  btn.classList.toggle('liked');
+}
+
+function comment() {
+  const txt = prompt("اكتب تعليقك:");
+  if (txt) alert("✅ تم إرسال التعليق");
+}
+
+function share() {
+  const text = "شاهد على VIRAL INFINITY 🔥";
+  if (navigator.share) navigator.share({text});
+  else { navigator.clipboard.writeText(text); alert("📋 تم النسخ"); }
+}
+
+function saveVideo(btn) {
+  btn.querySelector('.icon').textContent = '✅';
+  setTimeout(() => btn.querySelector('.icon').textContent = '🔖', 1200);
+}
+
+function loadFeed() {
+  const feed = document.getElementById('feed');
+  feed.innerHTML = '';
+  videos = [...sampleVideos[currentSource]];
+  
+  videos.forEach(video => feed.appendChild(createVideoCard(video)));
+  
+  setTimeout(() => {
+    document.getElementById('loading').style.display = 'none';
+    
+    // Auto play logic
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // Pause all other iframes
+          document.querySelectorAll('iframe').forEach(iframe => {
+            if (iframe.src.includes('youtube')) {
+              iframe.src = iframe.src.replace('autoplay=1', 'autoplay=0');
+            }
+          });
+        }
+      });
+    }, { threshold: 0.8 });
+    
+    document.querySelectorAll('.video-card').forEach(card => observer.observe(card));
+  }, 800);
+}
+
+// Source switch
+document.getElementById('sourceSelector').addEventListener('click', e => {
+  if (!e.target.classList.contains('source-btn')) return;
+  document.querySelectorAll('.source-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  currentSource = e.target.dataset.source;
+  loadFeed();
+});
+
+// Canvas background
+function initCanvas() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let w = canvas.width = window.innerWidth;
+  let h = canvas.height = window.innerHeight;
+  
+  window.addEventListener('resize', () => {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  });
+  
+  const particles = Array.from({length: 70}, () => ({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    size: Math.random() * 2 + 0.6,
+    speed: Math.random() * 0.5 + 0.2
+  }));
+  
+  function draw() {
+    ctx.fillStyle = 'rgba(5,8,18,0.12)';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = 'rgba(0,247,239,0.3)';
+    particles.forEach(p => {
+      p.y += p.speed;
+      if (p.y > h) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+window.onload = () => {
+  initCanvas();
+  loadFeed();
+};
+</script>
+</body>
+</html>
