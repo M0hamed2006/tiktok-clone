@@ -1,92 +1,122 @@
-cat > index.html <<'EOF'
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>VIRAL INFINITY — Rebuilt</title>
+  <meta name="theme-color" content="#07111f" />
+  <title>VIRAL INFINITY — Ultimate Feed</title>
   <style>
     :root{
       --bg:#07111f;
-      --bg2:#0b1528;
-      --card:rgba(15,23,42,.72);
-      --card2:rgba(10,16,29,.86);
-      --line:rgba(255,255,255,.08);
-      --text:#f8fbff;
-      --muted:rgba(248,251,255,.62);
+      --bg2:#0c1730;
+      --panel:rgba(9,15,27,.74);
+      --panel2:rgba(14,20,35,.9);
+      --line:rgba(255,255,255,.09);
+      --text:#f7fbff;
+      --muted:rgba(247,251,255,.64);
+      --muted2:rgba(247,251,255,.48);
       --primary:#ff3d71;
       --secondary:#2ce6d1;
       --gold:#ffd166;
-      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --shadow:0 18px 50px rgba(0,0,0,.36);
       --radius:24px;
       --radius2:18px;
+      --radius3:14px;
+      --ok:#22c55e;
+      --warn:#f59e0b;
+      --danger:#fb7185;
     }
+
     *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
     html,body{height:100%;margin:0}
     body{
-      font-family: system-ui, -apple-system, Segoe UI, Tahoma, Arial, sans-serif;
-      background:
-        radial-gradient(circle at 20% 10%, rgba(255,61,113,.12), transparent 25%),
-        radial-gradient(circle at 80% 20%, rgba(44,230,209,.11), transparent 24%),
-        linear-gradient(135deg, var(--bg), var(--bg2));
+      font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial,sans-serif;
       color:var(--text);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(255,61,113,.16), transparent 25%),
+        radial-gradient(circle at 80% 16%, rgba(44,230,209,.14), transparent 22%),
+        radial-gradient(circle at 70% 82%, rgba(255,209,102,.08), transparent 28%),
+        linear-gradient(135deg, var(--bg), var(--bg2));
       overflow:hidden;
     }
+
+    *:focus-visible{outline:2px solid rgba(44,230,209,.8);outline-offset:2px}
+
     .app{
       height:100vh;
       display:grid;
-      grid-template-columns: 86px minmax(0, 1fr) 320px;
+      grid-template-columns:88px minmax(0, 1fr) 340px;
       gap:12px;
       padding:12px;
     }
-    .panel,.feed,.left{
+
+    .shell,
+    .feed,
+    .sidebar{
       border:1px solid var(--line);
-      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      backdrop-filter: blur(18px);
-      box-shadow: var(--shadow);
-      border-radius: var(--radius);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      backdrop-filter:blur(18px);
+      box-shadow:var(--shadow);
+      border-radius:var(--radius);
       overflow:hidden;
     }
-    .left{
-      padding:12px 10px;
+
+    .shell{
       display:flex;
       flex-direction:column;
       align-items:center;
       gap:10px;
+      padding:12px 10px;
     }
+
     .brand{
-      width:58px;height:58px;border-radius:20px;
+      width:58px;height:58px;
+      border-radius:20px;
       display:grid;place-items:center;
       background:linear-gradient(135deg, var(--primary), var(--secondary));
-      font-size:1.65rem;
       box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 0 24px rgba(255,61,113,.25);
+      font-size:1.6rem;
       flex:0 0 auto;
     }
-    .dock{
-      display:flex;flex-direction:column;gap:8px;width:100%;margin-top:4px;
+
+    .brandText{
+      writing-mode:vertical-rl;
+      transform:rotate(180deg);
+      font-size:10px;
+      letter-spacing:.26em;
+      text-transform:uppercase;
+      color:rgba(255,255,255,.6);
+      margin-top:2px;
+      user-select:none;
     }
-    .dock button,.chip,.action{
+
+    .dock{display:flex;flex-direction:column;gap:8px;width:100%;margin-top:4px}
+    .dock button,
+    .chip,
+    .mini,
+    .action,
+    .segment button,
+    .pill{
       border:1px solid var(--line);
       background:rgba(255,255,255,.04);
       color:var(--text);
       border-radius:18px;
       cursor:pointer;
-      transition:.22s ease;
+      transition:.2s ease;
       user-select:none;
     }
+    .dock button:hover,.chip:hover,.mini:hover,.action:hover,.segment button:hover,.pill:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.18)}
+
     .dock button{
       width:100%;height:52px;
       display:grid;place-items:center;
-      font-size:1.25rem;
+      font-size:1.2rem;
     }
-    .dock button.active,.chip.active,.action.active{
-      background:linear-gradient(135deg, rgba(255,61,113,.25), rgba(44,230,209,.18));
-      border-color:rgba(44,230,209,.4);
-      box-shadow:0 0 0 1px rgba(44,230,209,.08), 0 0 28px rgba(44,230,209,.10);
-    }
-    .dock button:hover,.chip:hover,.action:hover{
-      transform:translateY(-2px);
-      border-color:rgba(255,255,255,.18);
+    .dock button.active,.chip.active,.mini.active,.action.active,.segment button.active,.pill.active{
+      background:linear-gradient(135deg, rgba(255,61,113,.22), rgba(44,230,209,.14));
+      border-color:rgba(44,230,209,.38);
+      box-shadow:0 0 0 1px rgba(44,230,209,.08), 0 0 24px rgba(44,230,209,.08);
     }
 
     .feed{
@@ -94,26 +124,21 @@ cat > index.html <<'EOF'
       overflow-y:auto;
       scroll-snap-type:y mandatory;
       scrollbar-width:thin;
-      scrollbar-color: rgba(44,230,209,.45) transparent;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      scrollbar-color: rgba(44,230,209,.42) transparent;
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
     }
     .feed::-webkit-scrollbar{width:8px}
-    .feed::-webkit-scrollbar-thumb{
-      background:linear-gradient(180deg, rgba(255,61,113,.7), rgba(44,230,209,.65));
-      border-radius:20px;
-    }
+    .feed::-webkit-scrollbar-thumb{background:linear-gradient(180deg, rgba(255,61,113,.7), rgba(44,230,209,.65));border-radius:20px}
 
     .topbar{
-      position:sticky;top:0;z-index:30;
-      padding:14px 14px 10px;
-      background:linear-gradient(180deg, rgba(7,17,31,.98), rgba(7,17,31,.58), transparent);
-      backdrop-filter: blur(14px);
+      position:sticky;top:0;z-index:35;
+      padding:14px 14px 12px;
+      background:linear-gradient(180deg, rgba(7,17,31,.98), rgba(7,17,31,.65), transparent);
+      backdrop-filter:blur(14px);
       border-bottom:1px solid var(--line);
     }
-    .searchrow{
-      display:flex; gap:10px; align-items:center;
-    }
+
+    .toprow{display:flex;align-items:center;gap:10px}
     .search{
       flex:1;
       display:flex;align-items:center;gap:10px;
@@ -123,20 +148,30 @@ cat > index.html <<'EOF'
       padding:12px 14px;
     }
     .search input{
-      width:100%;border:0;outline:0;background:transparent;color:var(--text);
-      font-size:15px;
+      width:100%;border:0;outline:0;background:transparent;color:var(--text);font-size:15px;
     }
-    .chips{
+
+    .badge2{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:9px 12px;border-radius:999px;
+      background:rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.09);
+      color:var(--text);font-size:12px;white-space:nowrap;
+    }
+
+    .subbar{
       display:flex;gap:8px;overflow:auto;padding:12px 0 2px;
       scrollbar-width:none;
     }
-    .chips::-webkit-scrollbar{display:none}
+    .subbar::-webkit-scrollbar{display:none}
+
     .chip{
-      padding:10px 14px;font-size:14px;white-space:nowrap;
-      color:var(--muted);
+      padding:10px 14px;font-size:14px;white-space:nowrap;color:var(--muted);
     }
     .chip.active{color:var(--text)}
+
     .feedlist{padding:0 12px 12px}
+
     .card{
       position:relative;
       height:calc(100vh - 110px);
@@ -149,51 +184,44 @@ cat > index.html <<'EOF'
       background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
       isolation:isolate;
     }
-    .media{
-      position:absolute;inset:0;
-      background:#000;
-    }
-    .media iframe, .media video{
-      width:100%;height:100%;border:0;display:block;object-fit:cover;
-      background:#000;
-    }
+
+    .media{position:absolute;inset:0;background:#000}
+    .media iframe,.media video{width:100%;height:100%;border:0;display:block;object-fit:cover;background:#000}
+
     .poster{
       position:absolute;inset:0;
       background:
-        linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.22)),
+        linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.24)),
         var(--poster, linear-gradient(135deg, #1b2440, #09111e));
       display:flex;align-items:flex-end;justify-content:space-between;
       padding:18px;
+      gap:12px;
     }
-    .poster .meta{
-      max-width:min(640px, 100%);
-      display:flex;flex-direction:column;gap:10px;
-    }
+    .poster.hidden{display:none !important}
+
+    .meta{max-width:min(700px, 100%);display:flex;flex-direction:column;gap:10px}
+    .line1{display:flex;gap:12px;align-items:center}
     .badge{
       width:52px;height:52px;border-radius:18px;
       display:grid;place-items:center;
       background:rgba(255,255,255,.10);
       border:1px solid rgba(255,255,255,.12);
-      font-size:1.4rem;
-      flex:0 0 auto;
+      font-size:1.4rem;flex:0 0 auto;
     }
-    .line1{display:flex;gap:12px;align-items:center}
     .author{font-weight:800;font-size:15px}
     .sub{color:var(--muted);font-size:13px}
     .title{
-      font-size:clamp(22px, 3.2vw, 42px);
+      font-size:clamp(22px, 3vw, 42px);
       line-height:1.1;
       font-weight:900;
       margin:2px 0 0;
       text-wrap:balance;
-      text-shadow:0 2px 20px rgba(0,0,0,.3);
+      text-shadow:0 2px 18px rgba(0,0,0,.35);
     }
     .desc{
-      color:rgba(248,251,255,.82);
-      font-size:15px;
-      line-height:1.7;
-      max-width:720px;
-      text-shadow:0 2px 16px rgba(0,0,0,.35);
+      color:rgba(247,251,255,.86);
+      font-size:15px;line-height:1.7;max-width:780px;
+      text-shadow:0 2px 14px rgba(0,0,0,.3);
     }
     .tags{display:flex;flex-wrap:wrap;gap:8px}
     .tag{
@@ -202,109 +230,24 @@ cat > index.html <<'EOF'
       border:1px solid rgba(44,230,209,.18);
       color:#bffdf6;
     }
+
     .rightstack{
       display:flex;flex-direction:column;gap:10px;align-items:flex-end;
-      margin-right:4px;
+      margin-right:4px;flex:0 0 auto;
     }
     .action{
       width:52px;height:52px;border-radius:18px;
       display:grid;place-items:center;
-      font-size:1.1rem;color:var(--text);
-    }
-    .action span{font-size:11px;opacity:.92;margin-top:2px}
-    .action .ico{font-size:1.15rem}
-    .stackcol{display:flex;flex-direction:column;align-items:center;gap:4px}
-    .badge2{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 12px;border-radius:999px;
-      background:rgba(0,0,0,.22);
-      border:1px solid rgba(255,255,255,.08);
       color:var(--text);
-      font-size:12px;
-      backdrop-filter: blur(8px);
     }
-    .hidden{display:none !important}
+    .stackcol{display:flex;flex-direction:column;align-items:center;gap:3px}
+    .ico{font-size:1.12rem}
+    .action span{font-size:11px;opacity:.94}
 
-    .panel{
-      padding:14px;
-      overflow-y:auto;
-      scrollbar-width:thin;
-      scrollbar-color: rgba(255,255,255,.16) transparent;
-    }
-    .panel::-webkit-scrollbar{width:7px}
-    .panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:20px}
-    .sect{
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--line);
-      border-radius:22px;
-      padding:14px;
-      margin-bottom:12px;
-    }
-    .sect h3{
-      margin:0 0 12px;
-      font-size:13px;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      color:rgba(255,255,255,.66);
-    }
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .mini{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.04);
-      color:var(--text);
-      border-radius:16px;
-      padding:10px 12px;
-      text-align:right;
-      cursor:pointer;
-    }
-    .mini.active{border-color:rgba(44,230,209,.4);background:rgba(44,230,209,.10)}
-    .trend{
-      display:flex;flex-direction:column;gap:10px;
-    }
-    .trenditem{
-      padding:10px 12px;border-radius:16px;
-      border:1px solid transparent;
-      background:rgba(255,255,255,.03);
-      cursor:pointer;
-    }
-    .trenditem:hover{border-color:rgba(44,230,209,.24);background:rgba(44,230,209,.08)}
-    .trendtop{display:flex;justify-content:space-between;gap:10px;align-items:center}
-    .trendtag{font-weight:800}
-    .trendsub{color:var(--muted);font-size:12px;margin-top:5px}
-    .stats{
-      display:grid;grid-template-columns:1fr;gap:8px;
-    }
-    .stat{
-      display:flex;justify-content:space-between;gap:10px;
-      padding:10px 12px;border-radius:16px;
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--line);
-    }
-    .stat strong{color:#fff}
-    .hint{
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.6;
-    }
-    .toast{
-      position:fixed;left:16px;bottom:16px;z-index:50;
-      padding:12px 14px;border-radius:14px;
-      background:rgba(7,17,31,.9);
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow:var(--shadow);
-      color:var(--text);
-      transform:translateY(20px);
-      opacity:0;
-      transition:.25s ease;
-      pointer-events:none;
-    }
-    .toast.show{transform:translateY(0);opacity:1}
     .empty{
       height:calc(100vh - 110px);
       display:grid;place-items:center;
-      color:var(--muted);
-      text-align:center;
-      padding:20px;
+      color:var(--muted);text-align:center;padding:20px;
     }
     .empty .box{
       max-width:520px;
@@ -315,10 +258,95 @@ cat > index.html <<'EOF'
     }
     .empty h2{margin:0 0 8px;color:var(--text)}
 
-    @media (max-width: 1180px){
-      .app{grid-template-columns:78px minmax(0,1fr);}
-      .panel{display:none}
+    .sidebar{
+      padding:14px;
+      overflow-y:auto;
+      scrollbar-width:thin;
+      scrollbar-color: rgba(255,255,255,.16) transparent;
     }
+    .sidebar::-webkit-scrollbar{width:7px}
+    .sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:20px}
+
+    .sect{
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:14px;
+      margin-bottom:12px;
+    }
+    .sect h3{
+      margin:0 0 12px;
+      font-size:13px;letter-spacing:.12em;
+      text-transform:uppercase;color:rgba(255,255,255,.66);
+    }
+
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .mini{
+      border-radius:16px;padding:10px 12px;text-align:right;
+    }
+    .mini.active{border-color:rgba(44,230,209,.4);background:rgba(44,230,209,.10)}
+
+    .segment{
+      display:grid;grid-template-columns:1fr 1fr;gap:8px;
+    }
+    .segment button{padding:10px 12px;text-align:center}
+
+    .trend{display:flex;flex-direction:column;gap:10px}
+    .trenditem{
+      padding:10px 12px;border-radius:16px;
+      border:1px solid transparent;background:rgba(255,255,255,.03);cursor:pointer;
+    }
+    .trenditem:hover{border-color:rgba(44,230,209,.24);background:rgba(44,230,209,.08)}
+    .trendtop{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .trendtag{font-weight:800}
+    .trendsub{color:var(--muted);font-size:12px;margin-top:5px}
+
+    .stats{display:grid;grid-template-columns:1fr;gap:8px}
+    .stat{
+      display:flex;justify-content:space-between;gap:10px;
+      padding:10px 12px;border-radius:16px;
+      background:rgba(255,255,255,.04);border:1px solid var(--line);
+    }
+    .stat strong{color:#fff}
+
+    .hint{color:var(--muted);font-size:13px;line-height:1.7}
+
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+    .pill{padding:9px 12px;font-size:12px;color:var(--muted)}
+    .pill.active{color:var(--text)}
+
+    .toast{
+      position:fixed;left:16px;bottom:16px;z-index:50;
+      padding:12px 14px;border-radius:14px;
+      background:rgba(7,17,31,.92);
+      border:1px solid rgba(255,255,255,.11);
+      box-shadow:var(--shadow);
+      color:var(--text);
+      transform:translateY(20px);
+      opacity:0;
+      transition:.25s ease;
+      pointer-events:none;
+      max-width:min(92vw, 360px);
+    }
+    .toast.show{transform:translateY(0);opacity:1}
+
+    .progressWrap{
+      height:4px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.06);margin-top:10px;
+    }
+    .progress{height:100%;width:0%;background:linear-gradient(90deg, var(--primary), var(--secondary));transition:width .15s linear}
+
+    .kbd{
+      display:inline-flex;align-items:center;justify-content:center;
+      min-width:22px;height:22px;padding:0 7px;
+      border-radius:8px;border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.05);font-size:11px;color:var(--muted);
+    }
+
+    @media (max-width: 1180px){
+      .app{grid-template-columns:78px minmax(0,1fr)}
+      .sidebar{display:none}
+    }
+
     @media (max-width: 760px){
       body{overflow:auto}
       .app{
@@ -326,45 +354,66 @@ cat > index.html <<'EOF'
         padding:0;
         gap:0;
       }
-      .left{display:none}
+      .shell{display:none}
       .feed{border-radius:0;min-height:100vh}
-      .card{
-        height:100vh;
-        min-height:100vh;
-        border-radius:0;
-        margin-bottom:0;
-      }
+      .card{height:100vh;min-height:100vh;border-radius:0;margin-bottom:0}
       .topbar{position:sticky}
       .poster{padding:16px}
       .rightstack{position:absolute;right:12px;bottom:120px}
+      .feedlist{padding:0}
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      html{scroll-behavior:auto}
+      *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <aside class="left">
+    <aside class="shell" aria-label="Navigation">
       <div class="brand">🎬</div>
+      <div class="brandText">Viral Infinity</div>
       <div class="dock" id="dock"></div>
     </aside>
 
     <main class="feed" id="feed">
       <div class="topbar">
-        <div class="searchrow">
-          <div class="search">
-            <span>🔍</span>
-            <input id="searchInput" placeholder="ابحث عن فيديو..." autocomplete="off" />
+        <div class="toprow">
+          <div class="search" role="search">
+            <span aria-hidden="true">🔎</span>
+            <input id="searchInput" placeholder="ابحث عن فيديو، creator، tag..." autocomplete="off" />
           </div>
           <div class="badge2" id="counter">0 فيديو</div>
         </div>
-        <div class="chips" id="chips"></div>
+
+        <div class="subbar" id="chips"></div>
+
+        <div class="toolbar" style="margin-top:10px">
+          <div class="pill active" data-sort="trending">ترند</div>
+          <div class="pill" data-sort="latest">الأحدث</div>
+          <div class="pill" data-sort="likes">الأكثر إعجابًا</div>
+          <div class="pill" data-sort="views">الأكثر مشاهدة</div>
+        </div>
+
+        <div class="progressWrap" aria-hidden="true"><div class="progress" id="progress"></div></div>
       </div>
+
       <div class="feedlist" id="feedList"></div>
     </main>
 
-    <aside class="panel">
+    <aside class="sidebar">
       <div class="sect">
         <h3>المصادر</h3>
         <div class="grid2" id="sourceGrid"></div>
+      </div>
+
+      <div class="sect">
+        <h3>تصفية سريعة</h3>
+        <div class="segment">
+          <button id="onlySaved">المحفوظات</button>
+          <button id="onlyLiked">الإعجابات</button>
+        </div>
       </div>
 
       <div class="sect">
@@ -378,15 +427,24 @@ cat > index.html <<'EOF'
           <div class="stat"><span>الفيديوهات</span><strong id="stCount">0</strong></div>
           <div class="stat"><span>المحفوظات</span><strong id="stSaved">0</strong></div>
           <div class="stat"><span>الإعجابات</span><strong id="stLiked">0</strong></div>
-          <div class="stat"><span>الوضع</span><strong>خفيف جدًا</strong></div>
+          <div class="stat"><span>الوضع</span><strong id="stMode">جاهز</strong></div>
+        </div>
+      </div>
+
+      <div class="sect">
+        <h3>اختصارات</h3>
+        <div class="hint">
+          <div>↑ ↓ للتنقل بين الكروت.</div>
+          <div><span class="kbd">/</span> للبحث.</div>
+          <div><span class="kbd">L</span> إعجاب، <span class="kbd">S</span> حفظ.</div>
+          <div><span class="kbd">Home</span> أول فيديو، <span class="kbd">End</span> آخر فيديو.</div>
         </div>
       </div>
 
       <div class="sect">
         <h3>مهم</h3>
         <div class="hint">
-          هذا البناء مخصص لفيديو واحد فعّال في كل مرة، لذلك صوت الفيديو السابق يتوقف فور التنقل.
-          لو أضفت embeds رسمية أو فيديوهاتك المباشرة، هتاخد أفضل أداء.
+          الفيديو النشط فقط هو الذي يعمل، والباقي بيتوقف تلقائيًا. لو حطيت embeds رسمية أو ملفاتك المباشرة، الأداء هيبقى أهدى وأسرع.
         </div>
       </div>
     </aside>
@@ -396,123 +454,159 @@ cat > index.html <<'EOF'
 
   <script>
     const SOURCES = [
-      { id: 'all', label: 'الكل', icon: '✨' },
-      { id: 'local', label: 'محلي', icon: '📼' },
-      { id: 'youtube', label: 'YouTube', icon: '▶️' },
-      { id: 'facebook', label: 'Facebook', icon: '👥' },
-      { id: 'tiktok', label: 'TikTok', icon: '🎵' },
+      { id:'all', label:'الكل', icon:'✨' },
+      { id:'local', label:'محلي', icon:'📼' },
+      { id:'youtube', label:'YouTube', icon:'▶️' },
+      { id:'facebook', label:'Facebook', icon:'👥' },
+      { id:'tiktok', label:'TikTok', icon:'🎵' },
     ];
 
-    const CATEGORIES = ['الكل', 'ترند', 'موسيقى', 'كوميديا', 'تعليم', 'ألعاب', 'فلوق'];
+    const CATEGORIES = ['الكل','ترند','موسيقى','كوميديا','تعليم','ألعاب','فلوق'];
 
-    // عدّل البيانات دي براحتك:
-    // provider: local | youtube | facebook | tiktok
-    // mediaUrl للـ local mp4
-    // youtubeId للفيديوهات اليوتيوب
-    // embedUrl لأي embed رسمي مسموح
     const ITEMS = [
       {
-        id: 1,
-        provider: 'local',
-        category: 'ترند',
-        author: 'Viral Lab',
-        avatar: 'V',
-        title: 'واجهة سريعة جدًا على ستايل الفيديوهات العمودية',
-        desc: 'فيديو محلي تجريبي يثبت إن الفيد شغال بسرعة ومن غير صوت متضارب.',
-        mediaUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-        poster: 'linear-gradient(135deg, #0f172a, #172554)',
-        views: 154000,
-        likes: 24000,
-        comments: 1800,
-        tags: ['خفيف', 'سريع', 'عمودي']
+        id:1,
+        provider:'local',
+        category:'ترند',
+        author:'Viral Lab',
+        avatar:'V',
+        title:'واجهة سريعة جدًا على ستايل الفيديوهات العمودية',
+        desc:'فيديو محلي تجريبي يثبت إن الفيد شغال بسرعة ومن غير صوت متضارب.',
+        mediaUrl:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+        poster:'linear-gradient(135deg, #0f172a, #172554)',
+        views:154000,
+        likes:24000,
+        comments:1800,
+        tags:['خفيف','سريع','عمودي'],
+        createdAt:'2026-04-20'
       },
       {
-        id: 2,
-        provider: 'youtube',
-        category: 'تعليم',
-        author: 'YouTube Demo',
-        avatar: 'Y',
-        title: 'فيديو يوتيوب مع تحكم كامل في الإيقاف والتشغيل',
-        desc: 'ده مثال يوتيوب. أول ما يتغير الكارد، الفيديو القديم بيتوقف من خلال التطبيق.',
-        youtubeId: 'M7lc1UVf-VE',
-        poster: 'linear-gradient(135deg, #111827, #1d4ed8)',
-        views: 992000,
-        likes: 110000,
-        comments: 6300,
-        tags: ['YouTube', 'API', 'تحكم']
+        id:2,
+        provider:'youtube',
+        category:'تعليم',
+        author:'YouTube Demo',
+        avatar:'Y',
+        title:'فيديو يوتيوب مع تحكم كامل في الإيقاف والتشغيل',
+        desc:'ده مثال يوتيوب. أول ما يتغير الكارد، الفيديو القديم بيتوقف من خلال التطبيق.',
+        youtubeId:'M7lc1UVf-VE',
+        poster:'linear-gradient(135deg, #111827, #1d4ed8)',
+        views:992000,
+        likes:110000,
+        comments:6300,
+        tags:['YouTube','API','تحكم'],
+        createdAt:'2026-04-19'
       },
       {
-        id: 3,
-        provider: 'local',
-        category: 'موسيقى',
-        author: 'Studio Wave',
-        avatar: 'S',
-        title: 'لو عايز سرعة حقيقية، ارفع ملفاتك أنت أو استريم خاص',
-        desc: 'ده أفضل حل للأداء، لأن الفيديو المباشر أخف من أي embed خارجي.',
-        mediaUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-        poster: 'linear-gradient(135deg, #1f2937, #065f46)',
-        views: 230000,
-        likes: 39000,
-        comments: 2100,
-        tags: ['أداء', 'Stream', 'سريع']
+        id:3,
+        provider:'local',
+        category:'موسيقى',
+        author:'Studio Wave',
+        avatar:'S',
+        title:'لو عايز سرعة حقيقية، ارفع ملفاتك أنت أو استريم خاص',
+        desc:'ده أفضل حل للأداء، لأن الفيديو المباشر أخف من أي embed خارجي.',
+        mediaUrl:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+        poster:'linear-gradient(135deg, #1f2937, #065f46)',
+        views:230000,
+        likes:39000,
+        comments:2100,
+        tags:['أداء','Stream','سريع'],
+        createdAt:'2026-04-18'
       },
       {
-        id: 4,
-        provider: 'facebook',
-        category: 'فلوق',
-        author: 'Facebook Embed',
-        avatar: 'F',
-        title: 'فيديو فيسبوك (ضع رابط embed الرسمي هنا)',
-        desc: 'الواجهة جاهزة، بس لازم تحط embed URL رسمي صالح لفيديو عام.',
-        embedUrl: '',
-        poster: 'linear-gradient(135deg, #0f172a, #7c3aed)',
-        views: 410000,
-        likes: 48000,
-        comments: 3200,
-        tags: ['Facebook', 'Embed', 'Public']
+        id:4,
+        provider:'facebook',
+        category:'فلوق',
+        author:'Facebook Embed',
+        avatar:'F',
+        title:'فيديو فيسبوك (ضع رابط embed الرسمي هنا)',
+        desc:'الواجهة جاهزة، بس لازم تحط embed URL رسمي صالح لفيديو عام.',
+        embedUrl:'',
+        poster:'linear-gradient(135deg, #0f172a, #7c3aed)',
+        views:410000,
+        likes:48000,
+        comments:3200,
+        tags:['Facebook','Embed','Public'],
+        createdAt:'2026-04-17'
       },
       {
-        id: 5,
-        provider: 'tiktok',
-        category: 'كوميديا',
-        author: 'TikTok Style',
-        avatar: 'T',
-        title: 'TikTok item placeholder',
-        desc: 'مكان جاهز لأي TikTok embed رسمي أو رابط محتوى مسموح.',
-        embedUrl: '',
-        poster: 'linear-gradient(135deg, #111827, #db2777)',
-        views: 870000,
-        likes: 125000,
-        comments: 9200,
-        tags: ['TikTok', 'Shorts', 'Feed']
+        id:5,
+        provider:'tiktok',
+        category:'كوميديا',
+        author:'TikTok Style',
+        avatar:'T',
+        title:'TikTok item placeholder',
+        desc:'مكان جاهز لأي TikTok embed رسمي أو رابط محتوى مسموح.',
+        embedUrl:'',
+        poster:'linear-gradient(135deg, #111827, #db2777)',
+        views:870000,
+        likes:125000,
+        comments:9200,
+        tags:['TikTok','Shorts','Feed'],
+        createdAt:'2026-04-16'
       },
       {
-        id: 6,
-        provider: 'youtube',
-        category: 'ألعاب',
-        author: 'YouTube Demo 2',
-        avatar: 'G',
-        title: 'كارد يوتيوب تاني للتبديل السريع بين أكثر من مصدر',
-        desc: 'التبديل هنا ينضف القلوب كلها: player واحد فقط نشط، والباقي متشال.',
-        youtubeId: 'dQw4w9WgXcQ',
-        poster: 'linear-gradient(135deg, #1f2937, #991b1b)',
-        views: 2200000,
-        likes: 310000,
-        comments: 19000,
-        tags: ['Switch', 'Mute', 'Clean']
+        id:6,
+        provider:'youtube',
+        category:'ألعاب',
+        author:'YouTube Demo 2',
+        avatar:'G',
+        title:'كارد يوتيوب تاني للتبديل السريع بين أكثر من مصدر',
+        desc:'التبديل هنا ينضف القلوب كلها: player واحد فقط نشط، والباقي متشال.',
+        youtubeId:'dQw4w9WgXcQ',
+        poster:'linear-gradient(135deg, #1f2937, #991b1b)',
+        views:2200000,
+        likes:310000,
+        comments:19000,
+        tags:['Switch','Mute','Clean'],
+        createdAt:'2026-04-15'
+      },
+      {
+        id:7,
+        provider:'local',
+        category:'تعليم',
+        author:'UI Mentor',
+        avatar:'U',
+        title:'تصميم نظيف مع قراءة سريعة للمحتوى',
+        desc:'كل حاجة هنا متقسمة بوضوح: مصدر، فئة، بحث، وعناصر تفاعل بسيطة.',
+        mediaUrl:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+        poster:'linear-gradient(135deg, #312e81, #1f2937)',
+        views:540000,
+        likes:70000,
+        comments:4100,
+        tags:['Design','UX','RTL'],
+        createdAt:'2026-04-14'
+      },
+      {
+        id:8,
+        provider:'local',
+        category:'ترند',
+        author:'Fast Feed',
+        avatar:'F',
+        title:'الكارد النشط فقط هو اللي يشتغل',
+        desc:'ده بيوفر الرام وبيقلل اللخبطة خصوصًا على الموبايل.',
+        mediaUrl:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+        poster:'linear-gradient(135deg, #3f1d53, #0f172a)',
+        views:780000,
+        likes:100000,
+        comments:7100,
+        tags:['One Active','Smooth','Mobile'],
+        createdAt:'2026-04-13'
       }
     ];
 
-    let state = {
-      source: 'all',
-      category: 'الكل',
-      query: '',
-      saved: new Set(),
-      liked: new Set(),
-      activeIndex: -1,
-      ytApiReady: false,
-      ytQueue: [],
-      players: new Map()
+    const state = {
+      source:'all',
+      category:'الكل',
+      query:'',
+      sort:'trending',
+      onlySaved:false,
+      onlyLiked:false,
+      saved:new Set(JSON.parse(localStorage.getItem('vi_saved') || '[]')),
+      liked:new Set(JSON.parse(localStorage.getItem('vi_liked') || '[]')),
+      activeIndex:-1,
+      players:new Map(),
+      ytQueue:[],
+      ytLoaded:false
     };
 
     const feed = document.getElementById('feed');
@@ -524,6 +618,14 @@ cat > index.html <<'EOF'
     const chips = document.getElementById('chips');
     const trend = document.getElementById('trend');
     const toast = document.getElementById('toast');
+    const progress = document.getElementById('progress');
+
+    const stCount = document.getElementById('stCount');
+    const stSaved = document.getElementById('stSaved');
+    const stLiked = document.getElementById('stLiked');
+    const stMode = document.getElementById('stMode');
+    const onlySavedBtn = document.getElementById('onlySaved');
+    const onlyLikedBtn = document.getElementById('onlyLiked');
 
     function showToast(msg){
       toast.textContent = msg;
@@ -538,19 +640,34 @@ cat > index.html <<'EOF'
       return String(n);
     }
 
-    function dataFilter(item){
+    function bySort(items){
+      const copy = [...items];
+      if(state.sort === 'latest') return copy.sort((a,b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+      if(state.sort === 'likes') return copy.sort((a,b) => b.likes - a.likes);
+      if(state.sort === 'views') return copy.sort((a,b) => b.views - a.views);
+      return copy.sort((a,b) => (b.views * 0.55 + b.likes * 0.35 + b.comments * 0.1) - (a.views * 0.55 + a.likes * 0.35 + a.comments * 0.1));
+    }
+
+    function matches(item){
       const matchesSource = state.source === 'all' || item.provider === state.source;
       const matchesCategory = state.category === 'الكل' || item.category === state.category;
       const q = state.query.trim().toLowerCase();
-      const matchesQuery = !q || [item.title, item.desc, item.author, ...(item.tags || [])]
-        .join(' ')
-        .toLowerCase()
-        .includes(q);
-      return matchesSource && matchesCategory && matchesQuery;
+      const hay = [item.title, item.desc, item.author, item.category, ...(item.tags || [])].join(' ').toLowerCase();
+      const matchesQuery = !q || hay.includes(q);
+      const matchesSaved = !state.onlySaved || state.saved.has(item.id);
+      const matchesLiked = !state.onlyLiked || state.liked.has(item.id);
+      return matchesSource && matchesCategory && matchesQuery && matchesSaved && matchesLiked;
     }
 
     function filteredItems(){
-      return ITEMS.filter(dataFilter);
+      return bySort(ITEMS.filter(matches));
+    }
+
+    function persist(){
+      try{
+        localStorage.setItem('vi_saved', JSON.stringify([...state.saved]));
+        localStorage.setItem('vi_liked', JSON.stringify([...state.liked]));
+      }catch(e){}
     }
 
     function renderSources(){
@@ -558,6 +675,7 @@ cat > index.html <<'EOF'
       sourceGrid.innerHTML = '';
       SOURCES.forEach(src => {
         const b1 = document.createElement('button');
+        b1.type = 'button';
         b1.innerHTML = src.icon;
         if(state.source === src.id) b1.classList.add('active');
         b1.onclick = () => setSource(src.id);
@@ -580,7 +698,7 @@ cat > index.html <<'EOF'
         el.onclick = () => {
           state.category = cat;
           state.activeIndex = -1;
-          renderAll();
+          renderAll(true);
           showToast(`تم اختيار: ${cat}`);
         };
         chips.appendChild(el);
@@ -608,7 +726,8 @@ cat > index.html <<'EOF'
         item.onclick = () => {
           state.query = tag.replace('#', '');
           searchInput.value = state.query;
-          renderAll();
+          state.activeIndex = -1;
+          renderAll(true);
           showToast(`بحث: ${tag}`);
         };
         trend.appendChild(item);
@@ -618,13 +737,14 @@ cat > index.html <<'EOF'
     function setSource(src){
       state.source = src;
       state.activeIndex = -1;
-      renderAll();
+      renderAll(true);
       showToast(`المصدر: ${src === 'all' ? 'الكل' : src}`);
     }
 
     function cardTemplate(item, index){
       const liked = state.liked.has(item.id);
       const saved = state.saved.has(item.id);
+      const likesShown = item.likes + (liked ? 1 : 0);
       return `
         <section class="card" data-index="${index}" data-id="${item.id}">
           <div class="media" data-media></div>
@@ -634,21 +754,19 @@ cat > index.html <<'EOF'
                 <div class="badge">${item.avatar || '▶️'}</div>
                 <div>
                   <div class="author">${item.author} · <span class="sub">${item.provider.toUpperCase()}</span></div>
-                  <div class="sub">${formatNumber(item.views)} مشاهدة · ${formatNumber(item.likes)} إعجاب</div>
+                  <div class="sub">${formatNumber(item.views)} مشاهدة · ${formatNumber(likesShown)} إعجاب · ${formatNumber(item.comments)} تعليق</div>
                 </div>
               </div>
               <div class="title">${item.title}</div>
               <div class="desc">${item.desc || ''}</div>
-              <div class="tags">
-                ${(item.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}
-              </div>
+              <div class="tags">${(item.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}</div>
             </div>
 
             <div class="rightstack">
               <div class="action" data-like title="إعجاب">
                 <div class="stackcol">
                   <div class="ico">${liked ? '❤️' : '🤍'}</div>
-                  <span>${formatNumber(item.likes + (liked ? 1 : 0))}</span>
+                  <span>${formatNumber(likesShown)}</span>
                 </div>
               </div>
               <div class="action" data-save title="حفظ">
@@ -672,19 +790,21 @@ cat > index.html <<'EOF'
     function renderFeed(){
       const items = filteredItems();
       counter.textContent = `${items.length} فيديو`;
-      document.getElementById('stCount').textContent = items.length;
-      document.getElementById('stSaved').textContent = state.saved.size;
-      document.getElementById('stLiked').textContent = state.liked.size;
+      stCount.textContent = items.length;
+      stSaved.textContent = state.saved.size;
+      stLiked.textContent = state.liked.size;
+      stMode.textContent = state.onlySaved ? 'المحفوظات' : state.onlyLiked ? 'الإعجابات' : 'جاهز';
 
       if(!items.length){
         feedList.innerHTML = `
           <div class="empty">
             <div class="box">
               <h2>مفيش نتائج</h2>
-              <div>جرّب تغيّر المصدر أو البحث أو الفئة.</div>
+              <div>جرّب تغيّر المصدر أو الفئة أو البحث.</div>
             </div>
           </div>
         `;
+        attachObserver();
         return;
       }
 
@@ -695,6 +815,7 @@ cat > index.html <<'EOF'
         card.querySelector('[data-like]').onclick = () => {
           if(state.liked.has(item.id)) state.liked.delete(item.id);
           else state.liked.add(item.id);
+          persist();
           renderAll(false);
           showToast(state.liked.has(item.id) ? 'اتعمل إعجاب' : 'اتشال الإعجاب');
         };
@@ -702,6 +823,7 @@ cat > index.html <<'EOF'
         card.querySelector('[data-save]').onclick = () => {
           if(state.saved.has(item.id)) state.saved.delete(item.id);
           else state.saved.add(item.id);
+          persist();
           renderAll(false);
           showToast(state.saved.has(item.id) ? 'اتحفظ' : 'اتشال من المحفوظات');
         };
@@ -710,10 +832,12 @@ cat > index.html <<'EOF'
           const text = `شاهد: ${item.title}`;
           try{
             if(navigator.share){
-              await navigator.share({ title: 'VIRAL INFINITY', text });
-            }else{
+              await navigator.share({ title:'VIRAL INFINITY', text });
+            }else if(navigator.clipboard){
               await navigator.clipboard.writeText(text);
               showToast('اتنسخ نص المشاركة');
+            }else{
+              showToast('المشاركة غير مدعومة هنا');
             }
           }catch(e){}
         };
@@ -724,8 +848,10 @@ cat > index.html <<'EOF'
     }
 
     function updateStats(){
-      document.getElementById('stSaved').textContent = state.saved.size;
-      document.getElementById('stLiked').textContent = state.liked.size;
+      stCount.textContent = filteredItems().length;
+      stSaved.textContent = state.saved.size;
+      stLiked.textContent = state.liked.size;
+      stMode.textContent = state.onlySaved ? 'المحفوظات' : state.onlyLiked ? 'الإعجابات' : 'جاهز';
     }
 
     function cleanupMedia(card){
@@ -733,8 +859,8 @@ cat > index.html <<'EOF'
       const media = card.querySelector('[data-media]');
       if(!media) return;
 
-      const ytId = media.dataset.yt;
       const kind = media.dataset.kind;
+      const ytId = media.dataset.yt;
 
       if(kind === 'video'){
         const v = media.querySelector('video');
@@ -775,56 +901,50 @@ cat > index.html <<'EOF'
       const media = card.querySelector('[data-media]');
       media.dataset.kind = 'youtube';
       media.dataset.yt = item.youtubeId;
-      media.innerHTML = '<div id="yt-' + item.id + '" style="width:100%;height:100%"></div>';
+      media.innerHTML = `<div id="yt-${item.id}" style="width:100%;height:100%"></div>`;
 
       const mount = () => {
         if(!window.YT || !window.YT.Player){
           state.ytQueue.push(() => mount());
           return;
         }
-        const player = new YT.Player('yt-' + item.id, {
-          videoId: item.youtubeId,
-          playerVars: {
-            autoplay: 1,
-            mute: 1,
-            controls: 0,
-            playsinline: 1,
-            rel: 0,
-            modestbranding: 1,
-            loop: 0,
-            fs: 0,
-            iv_load_policy: 3
+        const player = new YT.Player(`yt-${item.id}`, {
+          videoId:item.youtubeId,
+          playerVars:{
+            autoplay:1,
+            mute:1,
+            controls:0,
+            playsinline:1,
+            rel:0,
+            modestbranding:1,
+            loop:0,
+            fs:0,
+            iv_load_policy:3
           },
-          events: {
-            onReady: (e) => {
+          events:{
+            onReady:(e) => {
               try{ e.target.mute(); e.target.playVideo(); }catch(err){}
             }
           }
         });
         state.players.set(item.youtubeId, player);
       };
+
       mount();
     }
 
     function loadEmbed(card, item){
       const media = card.querySelector('[data-media]');
       media.dataset.kind = 'embed';
-
       if(item.embedUrl && item.embedUrl.trim()){
         media.innerHTML = `<iframe src="${item.embedUrl}" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
       }else{
         media.innerHTML = `
-          <div style="
-            width:100%;height:100%;display:grid;place-items:center;
-            background:linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.01));
-            padding:24px;text-align:center;
-          ">
+          <div style="width:100%;height:100%;display:grid;place-items:center;background:linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.01));padding:24px;text-align:center;">
             <div style="max-width:420px">
               <div style="font-size:3rem;margin-bottom:10px">⚠️</div>
               <div style="font-size:22px;font-weight:900;margin-bottom:10px">ضع embed رسمي هنا</div>
-              <div style="color:rgba(248,251,255,.7);line-height:1.8">
-                لو حطيت رابط embed صالح للفيديو العام، الكارد ده هيشتغل فورًا.
-              </div>
+              <div style="color:rgba(247,251,255,.72);line-height:1.8">لو حطيت رابط embed صالح للفيديو العام، الكارد ده هيشتغل فورًا.</div>
             </div>
           </div>
         `;
@@ -844,62 +964,77 @@ cat > index.html <<'EOF'
       const poster = card.querySelector('[data-poster]');
       if(poster) poster.classList.add('hidden');
 
-      const provider = item.provider;
-      if(provider === 'local') loadLocalVideo(card, item);
-      else if(provider === 'youtube') loadYoutubeVideo(card, item);
+      if(item.provider === 'local') loadLocalVideo(card, item);
+      else if(item.provider === 'youtube') loadYoutubeVideo(card, item);
       else loadEmbed(card, item);
     }
 
     function attachObserver(){
       if(window.__io) window.__io.disconnect();
-
       const cards = [...feedList.querySelectorAll('.card')];
       if(!cards.length) return;
 
       const io = new IntersectionObserver((entries) => {
         let best = null;
         entries.forEach(entry => {
-          if(entry.isIntersecting){
-            if(!best || entry.intersectionRatio > best.intersectionRatio) best = entry;
+          if(entry.isIntersecting && (!best || entry.intersectionRatio > best.intersectionRatio)){
+            best = entry;
           }
         });
         if(best){
-          const idx = Number(best.target.dataset.index);
-          mountActive(idx);
+          mountActive(Number(best.target.dataset.index));
         }
-      }, { root: feed, threshold: [0.35, 0.5, 0.65, 0.8] });
+      }, { root: feed, threshold:[0.35, 0.5, 0.65, 0.8] });
 
       cards.forEach(c => io.observe(c));
       window.__io = io;
 
-      // أول فيديو
       setTimeout(() => {
-        if(!cards.length) return;
-        mountActive(0);
+        if(cards.length) mountActive(0);
       }, 120);
     }
 
-    function renderAll(reset = true){
+    function renderAll(reset = false){
       renderSources();
       renderCategories();
       renderTrend();
       renderFeed();
-      if(reset){
-        feed.scrollTop = 0;
-      }
+      if(reset) feed.scrollTop = 0;
+      updateStats();
+      syncButtons();
     }
 
-    // YouTube IFrame API
+    function syncButtons(){
+      document.querySelectorAll('.pill').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.sort === state.sort);
+      });
+      onlySavedBtn.classList.toggle('active', state.onlySaved);
+      onlyLikedBtn.classList.toggle('active', state.onlyLiked);
+    }
+
+    function setSort(sort){
+      state.sort = sort;
+      renderAll(false);
+      showToast(`الترتيب: ${sort}`);
+    }
+
     function loadYouTubeAPI(){
       return new Promise((resolve) => {
         if(window.YT && window.YT.Player){
+          state.ytLoaded = true;
+          resolve();
+          return;
+        }
+        const existing = document.querySelector('script[data-yt-api]');
+        if(existing){
           resolve();
           return;
         }
         const tag = document.createElement('script');
         tag.src = 'https://www.youtube.com/iframe_api';
+        tag.dataset.ytApi = '1';
         window.onYouTubeIframeAPIReady = () => {
-          state.ytApiReady = true;
+          state.ytLoaded = true;
           while(state.ytQueue.length) (state.ytQueue.shift())();
           resolve();
         };
@@ -907,52 +1042,116 @@ cat > index.html <<'EOF'
       });
     }
 
-    // حدّث حالة أولية
+    function jumpActive(delta){
+      const cards = [...feedList.querySelectorAll('.card')];
+      if(!cards.length) return;
+      const next = Math.max(0, Math.min(cards.length - 1, (state.activeIndex < 0 ? 0 : state.activeIndex) + delta));
+      cards[next].scrollIntoView({ behavior:'smooth', block:'start' });
+      mountActive(next);
+    }
+
+    function toggleQuickFilter(type){
+      if(type === 'saved'){
+        state.onlySaved = !state.onlySaved;
+        if(state.onlySaved) state.onlyLiked = false;
+      }
+      if(type === 'liked'){
+        state.onlyLiked = !state.onlyLiked;
+        if(state.onlyLiked) state.onlySaved = false;
+      }
+      renderAll(true);
+      showToast(state.onlySaved ? 'عرض المحفوظات فقط' : state.onlyLiked ? 'عرض الإعجابات فقط' : 'إلغاء الفلاتر السريعة');
+    }
+
     searchInput.addEventListener('input', (e) => {
       state.query = e.target.value;
       state.activeIndex = -1;
-      renderFeed();
+      renderAll(true);
     });
 
-    // Play nicely with mobile swipe
-    let scrollTimer = null;
+    onlySavedBtn.addEventListener('click', () => toggleQuickFilter('saved'));
+    onlyLikedBtn.addEventListener('click', () => toggleQuickFilter('liked'));
+
+    document.querySelectorAll('.pill').forEach(btn => {
+      btn.addEventListener('click', () => setSort(btn.dataset.sort));
+    });
+
+    let progressTimer = null;
     feed.addEventListener('scroll', () => {
-      clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(() => {
-        // على الموبايل، لو المستخدم سحب بسرعة، الفيد هيختار الكارد النشط تلقائيًا عبر الـ observer
-      }, 60);
-    });
+      clearTimeout(progressTimer);
+      const max = feed.scrollHeight - feed.clientHeight;
+      const ratio = max > 0 ? Math.min(1, Math.max(0, feed.scrollTop / max)) : 0;
+      progress.style.width = `${ratio * 100}%`;
+      progressTimer = setTimeout(() => {}, 60);
+    }, { passive:true });
 
-    // init
-    renderAll(true);
-    loadYouTubeAPI();
-
-    // حفظ بيانات بسيطة بين الريلود
-    try{
-      const saved = JSON.parse(localStorage.getItem('vi_saved') || '[]');
-      const liked = JSON.parse(localStorage.getItem('vi_liked') || '[]');
-      state.saved = new Set(saved);
-      state.liked = new Set(liked);
-      updateStats();
-    }catch(e){}
-
-    setInterval(() => {
-      try{
-        localStorage.setItem('vi_saved', JSON.stringify([...state.saved]));
-        localStorage.setItem('vi_liked', JSON.stringify([...state.liked]));
-      }catch(e){}
-    }, 900);
-
-    // تحسين صغير: إيقاف أي صوت عند الخروج من التبويب
     document.addEventListener('visibilitychange', () => {
       if(document.hidden){
         const prev = feedList.querySelectorAll('.card')[state.activeIndex];
         if(prev) cleanupMedia(prev);
       }
     });
+
+    document.addEventListener('keydown', (e) => {
+      if(e.key === '/' && document.activeElement !== searchInput){
+        e.preventDefault();
+        searchInput.focus();
+        return;
+      }
+
+      if(document.activeElement === searchInput && e.key === 'Escape'){
+        searchInput.blur();
+        return;
+      }
+
+      if(e.key === 'ArrowDown'){
+        e.preventDefault();
+        jumpActive(1);
+      }
+      if(e.key === 'ArrowUp'){
+        e.preventDefault();
+        jumpActive(-1);
+      }
+      if(e.key === 'Home'){
+        e.preventDefault();
+        const cards = [...feedList.querySelectorAll('.card')];
+        if(cards.length) cards[0].scrollIntoView({ behavior:'smooth', block:'start' });
+      }
+      if(e.key === 'End'){
+        e.preventDefault();
+        const cards = [...feedList.querySelectorAll('.card')];
+        if(cards.length) cards[cards.length - 1].scrollIntoView({ behavior:'smooth', block:'start' });
+      }
+
+      const lower = e.key.toLowerCase();
+      if(lower === 'l'){
+        const item = filteredItems()[state.activeIndex];
+        if(item){
+          if(state.liked.has(item.id)) state.liked.delete(item.id);
+          else state.liked.add(item.id);
+          persist();
+          renderAll(false);
+          showToast(state.liked.has(item.id) ? 'اتعمل إعجاب' : 'اتشال الإعجاب');
+        }
+      }
+      if(lower === 's'){
+        const item = filteredItems()[state.activeIndex];
+        if(item){
+          if(state.saved.has(item.id)) state.saved.delete(item.id);
+          else state.saved.add(item.id);
+          persist();
+          renderAll(false);
+          showToast(state.saved.has(item.id) ? 'اتحفظ' : 'اتشال من المحفوظات');
+        }
+      }
+    });
+
+    window.addEventListener('beforeunload', persist);
+
+    renderAll(true);
+    loadYouTubeAPI();
+    syncButtons();
+    showToast('النسخة المطورة جاهزة');
   </script>
 </body>
 </html>
-EOF
-
-python3 -m http.server 8000
