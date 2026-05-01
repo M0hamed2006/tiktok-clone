@@ -172,6 +172,7 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
+      background: #000;
     }
 
     .overlay {
@@ -205,6 +206,7 @@
       cursor: pointer;
       transition: all 0.25s;
       backdrop-filter: blur(10px);
+      user-select: none;
     }
 
     .ctrl-btn:hover {
@@ -312,6 +314,7 @@
       font-size: 0.8rem;
       transition: all 0.25s;
       flex: 1;
+      user-select: none;
     }
 
     .action-btn:hover {
@@ -567,6 +570,8 @@ let currentCategory = 'all';
 let currentPlayingVideo = null;
 let watchTimers = {};
 let followed = {};
+let feedObserver = null;
+let currentSearchQuery = '';
 
 window.addEventListener('load', () => {
   initCanvas();
@@ -575,7 +580,16 @@ window.addEventListener('load', () => {
     document.getElementById('total').textContent = VIDEOS.length;
     renderFeed();
     updateTrending();
+    updateStats();
   }, 1000);
+});
+
+window.addEventListener('resize', () => {
+  const canvas = document.getElementById('bg');
+  if (canvas) {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
 });
 
 function initCanvas() {
@@ -621,13 +635,34 @@ function initCanvas() {
   draw();
 }
 
+function clearWatchTimers() {
+  Object.keys(watchTimers).forEach(id => {
+    clearInterval(watchTimers[id]);
+    delete watchTimers[id];
+  });
+}
+
 function renderFeed() {
   const feed = document.getElementById('feed');
   feed.innerHTML = '';
 
-  const filtered = currentCategory === 'all' 
-    ? VIDEOS 
-    : VIDEOS.filter(v => v.category === currentCategory);
+  if (feedObserver) {
+    feedObserver.disconnect();
+    feedObserver = null;
+  }
+
+  clearWatchTimers();
+
+  const filtered = currentSearchQuery.trim().length > 0
+    ? VIDEOS.filter(v => {
+        const q = currentSearchQuery.toLowerCase().trim();
+        return v.title.toLowerCase().includes(q) ||
+               v.channel.toLowerCase().includes(q) ||
+               v.category.toLowerCase().includes(q);
+      })
+    : (currentCategory === 'all'
+        ? VIDEOS
+        : VIDEOS.filter(v => v.category === currentCategory));
 
   if(filtered.length === 0) {
     feed.innerHTML = '<div class="no-videos"><div style="font-size: 3rem;">📭</div>لا توجد فيديوهات</div>';
@@ -642,13 +677,16 @@ function renderFeed() {
 
     post.innerHTML = `
       <div class="video-player">
-        <video 
-          id="vid-${video.id}" 
-          autoplay 
+        <video
+          id="vid-${video.id}"
+          autoplay
           muted
           loop
           playsinline
-          onplay="startWatchTimer(${video.id})" 
+          webkit-playsinline
+          preload="metadata"
+          onloadeddata="tryAutoPlay(${video.id})"
+          onplay="startWatchTimer(${video.id})"
           onpause="stopWatchTimer(${video.id})"
           onended="stopWatchTimer(${video.id})">
           <source src="${video.url}" type="video/mp4">
@@ -657,11 +695,11 @@ function renderFeed() {
 
         <div class="controls-right">
           <div style="text-align: center;">
-            <div class="ctrl-btn ${liked ? 'active' : ''}" onclick="toggleLike(${video.id}, this)">❤️</div>
+            <div class="ctrl-btn ${liked ? 'active' : ''}" data-like-id="${video.id}" onclick="toggleLike(${video.id}, this)">❤️</div>
             <div style="font-size: 0.65rem; color: white; margin-top: 4px;">إعجاب</div>
           </div>
           <div style="text-align: center;">
-            <div class="ctrl-btn" onclick="shareVideo('${video.title}')">📤</div>
+            <div class="ctrl-btn" onclick="shareVideo(${JSON.stringify(video.title)})">📤</div>
             <div style="font-size: 0.65rem; color: white; margin-top: 4px;">شارك</div>
           </div>
           <div style="text-align: center;">
@@ -692,7 +730,7 @@ function renderFeed() {
         <div class="video-title">${video.title}</div>
 
         <div class="bottom-actions">
-          <div class="action-btn ${liked ? 'liked' : ''}" onclick="toggleLike(${video.id}, this)">
+          <div class="action-btn ${liked ? 'liked' : ''}" data-like-id="${video.id}" onclick="toggleLike(${video.id}, this)">
             <div class="action-icon">❤️</div>
             <span>إعجاب</span>
           </div>
@@ -700,7 +738,7 @@ function renderFeed() {
             <div class="action-icon">💬</div>
             <span>تعليق</span>
           </div>
-          <div class="action-btn" onclick="shareVideo('${video.title}')">
+          <div class="action-btn" onclick="shareVideo(${JSON.stringify(video.title)})">
             <div class="action-icon">📤</div>
             <span>شارك</span>
           </div>
@@ -709,41 +747,61 @@ function renderFeed() {
     `;
 
     feed.appendChild(post);
+
+    const videoEl = post.querySelector('video');
+    if (videoEl) {
+      videoEl.muted = localStorage.getItem('soundOff') !== 'false' && localStorage.getItem('soundOff') === 'true';
+      videoEl.load();
+    }
   });
 
   setupObserver();
+  updateStats();
+}
+
+function tryAutoPlay(id) {
+  const video = document.getElementById(`vid-${id}`);
+  if (!video) return;
+
+  const isMuted = localStorage.getItem('soundOff') === 'true';
+  video.muted = isMuted ? true : false;
+
+  const playPromise = video.play();
+  if (playPromise && typeof playPromise.catch === 'function') {
+    playPromise.catch(() => {});
+  }
 }
 
 function setupObserver() {
-  const observer = new IntersectionObserver(entries => {
+  feedObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       const video = entry.target.querySelector('video');
       if(!video) return;
-      
+
       if(entry.isIntersecting) {
         if(currentPlayingVideo && currentPlayingVideo !== video) {
           currentPlayingVideo.pause();
           currentPlayingVideo.currentTime = 0;
         }
         currentPlayingVideo = video;
+        video.muted = localStorage.getItem('soundOff') === 'true';
         video.play().catch(() => {});
       } else {
         if(video === currentPlayingVideo) {
           video.pause();
-          video.currentTime = 0;
           currentPlayingVideo = null;
         }
       }
     });
   }, { threshold: 0.5 });
 
-  document.querySelectorAll('.video-post').forEach(p => observer.observe(p));
+  document.querySelectorAll('.video-post').forEach(p => feedObserver.observe(p));
 }
 
 // ===== WATCH TIME (CORRECT) =====
 function startWatchTimer(id) {
   if(watchTimers[id]) return;
-  
+
   watchTimers[id] = setInterval(() => {
     stats.watchTime++;
     document.getElementById('time').textContent = stats.watchTime + ' ث';
@@ -758,33 +816,39 @@ function stopWatchTimer(id) {
 }
 
 // ===== LIKE (FIXED) =====
+function syncLikeUI(id, likedState) {
+  document.querySelectorAll(`[data-like-id="${id}"]`).forEach(el => {
+    if (el.classList.contains('ctrl-btn')) {
+      el.classList.toggle('active', likedState);
+    } else {
+      el.classList.toggle('liked', likedState);
+    }
+  });
+}
+
 function toggleLike(id, el) {
-  const wasLiked = currentLikes[id];
-  
+  const wasLiked = !!currentLikes[id];
+
   if(wasLiked) {
-    // Unlike
     delete currentLikes[id];
-    stats.likes--;
-    stats.totalLikes--;
-    if(el.classList) el.classList.remove('active');
-    else el.closest('.action-btn').classList.remove('liked');
+    stats.likes = Math.max(0, stats.likes - 1);
+    stats.totalLikes = Math.max(0, stats.totalLikes - 1);
+    syncLikeUI(id, false);
   } else {
-    // Like
     currentLikes[id] = true;
     stats.likes++;
     stats.totalLikes++;
-    if(el.classList) el.classList.add('active');
-    else el.closest('.action-btn').classList.add('liked');
+    syncLikeUI(id, true);
   }
-  
-  document.getElementById('likes').textContent = stats.totalLikes;
+
+  updateStats();
   notify(wasLiked ? '💔 تم الإلغاء' : '❤️ تم الإعجاب!');
 }
 
 // ===== SOUND CONTROL =====
 function toggleSound(btn) {
   const isMuted = localStorage.getItem('soundOff') === 'true';
-  
+
   if(isMuted) {
     localStorage.removeItem('soundOff');
     btn.classList.remove('active');
@@ -798,38 +862,51 @@ function toggleSound(btn) {
   }
 }
 
+function updateStats() {
+  document.getElementById('likes').textContent = stats.totalLikes;
+  document.getElementById('time').textContent = stats.watchTime + ' ث';
+  document.getElementById('followers').textContent = stats.followers;
+  document.getElementById('total').textContent = VIDEOS.length;
+}
+
 // ===== OTHER ACTIONS =====
 function comment() { notify('💬 أضف تعليقك!'); }
 
-function shareVideo(title) { 
-  if(navigator.share) navigator.share({text: title});
-  else {
-    navigator.clipboard.writeText(title);
-    notify('📤 تم النسخ!');
+function shareVideo(title) {
+  if(navigator.share) {
+    navigator.share({ text: title }).catch(() => {});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(title).then(() => {
+      notify('📤 تم النسخ!');
+    }).catch(() => {
+      notify('📤 حصلت مشكلة في النسخ');
+    });
+  } else {
+    notify('📤 تم!');
   }
 }
 
-function bookmarkVideo(el) { 
+function bookmarkVideo(el) {
   el.classList.toggle('active');
   notify('🔖');
 }
 
 function followChannel(id, btn) {
   followed[id] = !followed[id];
-  
+
   if(followed[id]) {
     btn.textContent = '✓ متابع';
     btn.classList.add('followed');
     stats.followers++;
-    document.getElementById('followers').textContent = stats.followers;
     notify('✓ تمت المتابعة!');
   } else {
     btn.textContent = 'متابعة';
     btn.classList.remove('followed');
-    stats.followers--;
-    document.getElementById('followers').textContent = stats.followers;
+    stats.followers = Math.max(0, stats.followers - 1);
     notify('💔 تم إلغاء المتابعة');
   }
+
+  updateStats();
 }
 
 // ===== NAVIGATION =====
@@ -837,6 +914,7 @@ function switchNav(e, cat) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   e.target.classList.add('active');
   currentCategory = cat;
+  currentSearchQuery = '';
   document.getElementById('searchInput').value = '';
   renderFeed();
 }
@@ -845,40 +923,44 @@ function filterCategory(e, cat) {
   document.querySelectorAll('.filter-btn').forEach(f => f.classList.remove('active'));
   e.target.classList.add('active');
   currentCategory = cat;
+  currentSearchQuery = '';
   document.getElementById('searchInput').value = '';
   renderFeed();
 }
 
 // ===== SMART SEARCH (CASE INSENSITIVE) =====
 function searchVideos(q) {
-  if(q.length < 1) { 
-    document.getElementById('searchInput').value = '';
-    renderFeed(); 
-    return; 
+  currentSearchQuery = q || '';
+
+  if(currentSearchQuery.length < 1) {
+    renderFeed();
+    return;
   }
-  
+
+  const query = currentSearchQuery.toLowerCase().trim();
   const feed = document.getElementById('feed');
-  const query = q.toLowerCase().trim();
-  
-  const filtered = VIDEOS.filter(v => 
-    v.title.toLowerCase().includes(query) || 
+
+  const filtered = VIDEOS.filter(v =>
+    v.title.toLowerCase().includes(query) ||
     v.channel.toLowerCase().includes(query) ||
     v.category.toLowerCase().includes(query)
   );
-  
+
+  feed.innerHTML = '';
+
   if(!filtered.length) {
     feed.innerHTML = '<div class="no-videos"><div style="font-size: 3rem;">🔍</div>لا توجد نتائج</div>';
     return;
   }
 
-  feed.innerHTML = '';
   filtered.forEach(v => {
     const div = document.createElement('div');
     div.innerHTML = `<div style="padding: 10px; background: var(--card); border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid var(--border); font-weight: 700;">${v.title}</div>`;
-    div.onclick = () => { 
-      currentCategory = v.category; 
+    div.onclick = () => {
+      currentCategory = v.category;
+      currentSearchQuery = '';
       document.getElementById('searchInput').value = '';
-      renderFeed(); 
+      renderFeed();
     };
     feed.appendChild(div);
   });
@@ -901,7 +983,18 @@ function updateTrending() {
 
 function notify(emoji) {
   const n = document.createElement('div');
-  n.style.cssText = `position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 12px 20px; border-radius: 12px; z-index: 5000; animation: slideIn 0.3s ease; font-weight: 700;`;
+  n.style.cssText = `
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    z-index: 5000;
+    animation: slideIn 0.3s ease;
+    font-weight: 700;
+  `;
   n.textContent = emoji;
   document.body.appendChild(n);
   setTimeout(() => n.remove(), 1500);
