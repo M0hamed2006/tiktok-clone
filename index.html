@@ -1,1157 +1,957 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#07111f" />
-  <title>VIRAL INFINITY — Ultimate Feed</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🎥 VIRAL PRIME - أفضل منصة فيديوهات</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#07111f;
-      --bg2:#0c1730;
-      --panel:rgba(9,15,27,.74);
-      --panel2:rgba(14,20,35,.9);
-      --line:rgba(255,255,255,.09);
-      --text:#f7fbff;
-      --muted:rgba(247,251,255,.64);
-      --muted2:rgba(247,251,255,.48);
-      --primary:#ff3d71;
-      --secondary:#2ce6d1;
-      --gold:#ffd166;
-      --shadow:0 18px 50px rgba(0,0,0,.36);
-      --radius:24px;
-      --radius2:18px;
-      --radius3:14px;
-      --ok:#22c55e;
-      --warn:#f59e0b;
-      --danger:#fb7185;
+    :root {
+      --primary: #ff0050;
+      --secondary: #00f7ef;
+      --tertiary: #ffd700;
+      --dark: #0a0e27;
+      --darker: #050812;
+      --card: rgba(20, 30, 60, 0.5);
+      --border: rgba(0, 247, 239, 0.1);
+      --text: #ffffff;
+      --text-dim: rgba(255,255,255,0.4);
+      --glow-primary: 0 0 25px rgba(255, 0, 80, 0.35);
+      --glow-secondary: 0 0 25px rgba(0, 247, 239, 0.25);
     }
 
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    html,body{height:100%;margin:0}
-    body{
-      font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial,sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(circle at 18% 12%, rgba(255,61,113,.16), transparent 25%),
-        radial-gradient(circle at 80% 16%, rgba(44,230,209,.14), transparent 22%),
-        radial-gradient(circle at 70% 82%, rgba(255,209,102,.08), transparent 28%),
-        linear-gradient(135deg, var(--bg), var(--bg2));
-      overflow:hidden;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    *:focus-visible{outline:2px solid rgba(44,230,209,.8);outline-offset:2px}
-
-    .app{
-      height:100vh;
-      display:grid;
-      grid-template-columns:88px minmax(0, 1fr) 340px;
-      gap:12px;
-      padding:12px;
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+      color: var(--text);
     }
 
-    .shell,
-    .feed,
-    .sidebar{
-      border:1px solid var(--line);
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      backdrop-filter:blur(18px);
-      box-shadow:var(--shadow);
-      border-radius:var(--radius);
-      overflow:hidden;
+    /* ===== BG ===== */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
     }
 
-    .shell{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:10px;
-      padding:12px 10px;
+    /* ===== LOADING ===== */
+    #loading {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
     }
 
-    .brand{
-      width:58px;height:58px;
-      border-radius:20px;
-      display:grid;place-items:center;
-      background:linear-gradient(135deg, var(--primary), var(--secondary));
-      box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 0 24px rgba(255,61,113,.25);
-      font-size:1.6rem;
-      flex:0 0 auto;
+    #loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s;
     }
 
-    .brandText{
-      writing-mode:vertical-rl;
-      transform:rotate(180deg);
-      font-size:10px;
-      letter-spacing:.26em;
-      text-transform:uppercase;
-      color:rgba(255,255,255,.6);
-      margin-top:2px;
-      user-select:none;
+    .loader-dot {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
     }
 
-    .dock{display:flex;flex-direction:column;gap:8px;width:100%;margin-top:4px}
-    .dock button,
-    .chip,
-    .mini,
-    .action,
-    .segment button,
-    .pill{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.04);
-      color:var(--text);
-      border-radius:18px;
-      cursor:pointer;
-      transition:.2s ease;
-      user-select:none;
-    }
-    .dock button:hover,.chip:hover,.mini:hover,.action:hover,.segment button:hover,.pill:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.18)}
-
-    .dock button{
-      width:100%;height:52px;
-      display:grid;place-items:center;
-      font-size:1.2rem;
-    }
-    .dock button.active,.chip.active,.mini.active,.action.active,.segment button.active,.pill.active{
-      background:linear-gradient(135deg, rgba(255,61,113,.22), rgba(44,230,209,.14));
-      border-color:rgba(44,230,209,.38);
-      box-shadow:0 0 0 1px rgba(44,230,209,.08), 0 0 24px rgba(44,230,209,.08);
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary);
+      animation: bounce 1.4s infinite;
     }
 
-    .feed{
-      position:relative;
-      overflow-y:auto;
-      scroll-snap-type:y mandatory;
-      scrollbar-width:thin;
-      scrollbar-color: rgba(44,230,209,.42) transparent;
-      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
-    }
-    .feed::-webkit-scrollbar{width:8px}
-    .feed::-webkit-scrollbar-thumb{background:linear-gradient(180deg, rgba(255,61,113,.7), rgba(44,230,209,.65));border-radius:20px}
-
-    .topbar{
-      position:sticky;top:0;z-index:35;
-      padding:14px 14px 12px;
-      background:linear-gradient(180deg, rgba(7,17,31,.98), rgba(7,17,31,.65), transparent);
-      backdrop-filter:blur(14px);
-      border-bottom:1px solid var(--line);
+    .dot:nth-child(2) {
+      animation-delay: 0.2s;
+      background: var(--secondary);
     }
 
-    .toprow{display:flex;align-items:center;gap:10px}
-    .search{
-      flex:1;
-      display:flex;align-items:center;gap:10px;
-      border:1px solid var(--line);
-      border-radius:18px;
-      background:rgba(255,255,255,.05);
-      padding:12px 14px;
-    }
-    .search input{
-      width:100%;border:0;outline:0;background:transparent;color:var(--text);font-size:15px;
+    .dot:nth-child(3) {
+      animation-delay: 0.4s;
+      background: var(--tertiary);
     }
 
-    .badge2{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:9px 12px;border-radius:999px;
-      background:rgba(0,0,0,.22);
-      border:1px solid rgba(255,255,255,.09);
-      color:var(--text);font-size:12px;white-space:nowrap;
+    @keyframes bounce {
+      0%, 100% { transform: scale(0.8); opacity: 0.5; }
+      50% { transform: scale(1.3); opacity: 1; }
     }
 
-    .subbar{
-      display:flex;gap:8px;overflow:auto;padding:12px 0 2px;
-      scrollbar-width:none;
-    }
-    .subbar::-webkit-scrollbar{display:none}
-
-    .chip{
-      padding:10px 14px;font-size:14px;white-space:nowrap;color:var(--muted);
-    }
-    .chip.active{color:var(--text)}
-
-    .feedlist{padding:0 12px 12px}
-
-    .card{
-      position:relative;
-      height:calc(100vh - 110px);
-      min-height:620px;
-      margin-bottom:12px;
-      scroll-snap-align:start;
-      border:1px solid var(--line);
-      border-radius:28px;
-      overflow:hidden;
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      isolation:isolate;
+    .loader-text {
+      color: var(--secondary);
+      font-weight: 900;
+      letter-spacing: 2px;
+      font-size: 0.9rem;
     }
 
-    .media{position:absolute;inset:0;background:#000}
-    .media iframe,.media video{width:100%;height:100%;border:0;display:block;object-fit:cover;background:#000}
-
-    .poster{
-      position:absolute;inset:0;
-      background:
-        linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.24)),
-        var(--poster, linear-gradient(135deg, #1b2440, #09111e));
-      display:flex;align-items:flex-end;justify-content:space-between;
-      padding:18px;
-      gap:12px;
-    }
-    .poster.hidden{display:none !important}
-
-    .meta{max-width:min(700px, 100%);display:flex;flex-direction:column;gap:10px}
-    .line1{display:flex;gap:12px;align-items:center}
-    .badge{
-      width:52px;height:52px;border-radius:18px;
-      display:grid;place-items:center;
-      background:rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.12);
-      font-size:1.4rem;flex:0 0 auto;
-    }
-    .author{font-weight:800;font-size:15px}
-    .sub{color:var(--muted);font-size:13px}
-    .title{
-      font-size:clamp(22px, 3vw, 42px);
-      line-height:1.1;
-      font-weight:900;
-      margin:2px 0 0;
-      text-wrap:balance;
-      text-shadow:0 2px 18px rgba(0,0,0,.35);
-    }
-    .desc{
-      color:rgba(247,251,255,.86);
-      font-size:15px;line-height:1.7;max-width:780px;
-      text-shadow:0 2px 14px rgba(0,0,0,.3);
-    }
-    .tags{display:flex;flex-wrap:wrap;gap:8px}
-    .tag{
-      padding:7px 11px;border-radius:999px;font-size:12px;
-      background:rgba(44,230,209,.12);
-      border:1px solid rgba(44,230,209,.18);
-      color:#bffdf6;
+    /* ===== MAIN LAYOUT ===== */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 70px 1fr 300px;
+      height: 100vh;
+      gap: 8px;
+      padding: 8px;
+      position: relative;
+      z-index: 2;
     }
 
-    .rightstack{
-      display:flex;flex-direction:column;gap:10px;align-items:flex-end;
-      margin-right:4px;flex:0 0 auto;
-    }
-    .action{
-      width:52px;height:52px;border-radius:18px;
-      display:grid;place-items:center;
-      color:var(--text);
-    }
-    .stackcol{display:flex;flex-direction:column;align-items:center;gap:3px}
-    .ico{font-size:1.12rem}
-    .action span{font-size:11px;opacity:.94}
-
-    .empty{
-      height:calc(100vh - 110px);
-      display:grid;place-items:center;
-      color:var(--muted);text-align:center;padding:20px;
-    }
-    .empty .box{
-      max-width:520px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      border-radius:24px;
-      padding:28px;
-    }
-    .empty h2{margin:0 0 8px;color:var(--text)}
-
-    .sidebar{
-      padding:14px;
-      overflow-y:auto;
-      scrollbar-width:thin;
-      scrollbar-color: rgba(255,255,255,.16) transparent;
-    }
-    .sidebar::-webkit-scrollbar{width:7px}
-    .sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:20px}
-
-    .sect{
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--line);
-      border-radius:22px;
-      padding:14px;
-      margin-bottom:12px;
-    }
-    .sect h3{
-      margin:0 0 12px;
-      font-size:13px;letter-spacing:.12em;
-      text-transform:uppercase;color:rgba(255,255,255,.66);
+    /* ===== SIDEBAR LEFT ===== */
+    .sidebar-left {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 0;
     }
 
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .mini{
-      border-radius:16px;padding:10px 12px;text-align:right;
-    }
-    .mini.active{border-color:rgba(44,230,209,.4);background:rgba(44,230,209,.10)}
-
-    .segment{
-      display:grid;grid-template-columns:1fr 1fr;gap:8px;
-    }
-    .segment button{padding:10px 12px;text-align:center}
-
-    .trend{display:flex;flex-direction:column;gap:10px}
-    .trenditem{
-      padding:10px 12px;border-radius:16px;
-      border:1px solid transparent;background:rgba(255,255,255,.03);cursor:pointer;
-    }
-    .trenditem:hover{border-color:rgba(44,230,209,.24);background:rgba(44,230,209,.08)}
-    .trendtop{display:flex;justify-content:space-between;gap:10px;align-items:center}
-    .trendtag{font-weight:800}
-    .trendsub{color:var(--muted);font-size:12px;margin-top:5px}
-
-    .stats{display:grid;grid-template-columns:1fr;gap:8px}
-    .stat{
-      display:flex;justify-content:space-between;gap:10px;
-      padding:10px 12px;border-radius:16px;
-      background:rgba(255,255,255,.04);border:1px solid var(--line);
-    }
-    .stat strong{color:#fff}
-
-    .hint{color:var(--muted);font-size:13px;line-height:1.7}
-
-    .toolbar{display:flex;gap:8px;flex-wrap:wrap}
-    .pill{padding:9px 12px;font-size:12px;color:var(--muted)}
-    .pill.active{color:var(--text)}
-
-    .toast{
-      position:fixed;left:16px;bottom:16px;z-index:50;
-      padding:12px 14px;border-radius:14px;
-      background:rgba(7,17,31,.92);
-      border:1px solid rgba(255,255,255,.11);
-      box-shadow:var(--shadow);
-      color:var(--text);
-      transform:translateY(20px);
-      opacity:0;
-      transition:.25s ease;
-      pointer-events:none;
-      max-width:min(92vw, 360px);
-    }
-    .toast.show{transform:translateY(0);opacity:1}
-
-    .progressWrap{
-      height:4px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.06);margin-top:10px;
-    }
-    .progress{height:100%;width:0%;background:linear-gradient(90deg, var(--primary), var(--secondary));transition:width .15s linear}
-
-    .kbd{
-      display:inline-flex;align-items:center;justify-content:center;
-      min-width:22px;height:22px;padding:0 7px;
-      border-radius:8px;border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.05);font-size:11px;color:var(--muted);
+    .logo {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: var(--glow-primary);
     }
 
-    @media (max-width: 1180px){
-      .app{grid-template-columns:78px minmax(0,1fr)}
-      .sidebar{display:none}
+    .logo:hover {
+      transform: scale(1.1) rotate(-5deg);
     }
 
-    @media (max-width: 760px){
-      body{overflow:auto}
-      .app{
-        grid-template-columns:1fr;
-        padding:0;
-        gap:0;
+    .nav-btn {
+      width: 55px;
+      height: 55px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: all 0.25s;
+      color: var(--text-dim);
+    }
+
+    .nav-btn:hover {
+      background: rgba(0, 247, 239, 0.08);
+      border-color: var(--secondary);
+      color: var(--secondary);
+      transform: translateY(-3px);
+    }
+
+    .nav-btn.active {
+      background: linear-gradient(135deg, var(--primary), rgba(255, 0, 80, 0.5));
+      border-color: var(--primary);
+      color: var(--text);
+      box-shadow: var(--glow-primary);
+    }
+
+    /* ===== FEED ===== */
+    #feed {
+      position: relative;
+      height: 100%;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 4px;
+    }
+
+    #feed::-webkit-scrollbar {
+      display: none;
+    }
+
+    .video-item {
+      height: 100%;
+      min-height: 620px;
+      scroll-snap-align: start;
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      background: var(--card);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .video-player {
+      flex: 1;
+      position: relative;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .video-player video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .video-player iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .video-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.5) 100%);
+      pointer-events: none;
+    }
+
+    .video-controls {
+      position: absolute;
+      right: 15px;
+      bottom: 80px;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .control-btn {
+      width: 50px;
+      height: 50px;
+      background: rgba(0,0,0,0.5);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .control-btn:hover {
+      background: rgba(255, 0, 80, 0.7);
+      transform: scale(1.1);
+    }
+
+    .control-btn.active {
+      background: var(--primary);
+      box-shadow: var(--glow-primary);
+    }
+
+    .video-info {
+      padding: 20px;
+      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.8) 100%);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+    }
+
+    .channel-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      justify-content: space-between;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1rem;
+      border: 2px solid var(--secondary);
+    }
+
+    .channel-info {
+      flex: 1;
+    }
+
+    .channel-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 2px;
+    }
+
+    .channel-meta {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .follow-btn {
+      background: var(--primary);
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.25s;
+    }
+
+    .follow-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--glow-primary);
+    }
+
+    .video-desc {
+      font-size: 0.95rem;
+      line-height: 1.4;
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .engagement-row {
+      display: flex;
+      justify-content: space-around;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .engage-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      transition: all 0.25s;
+      flex: 1;
+      padding: 8px;
+    }
+
+    .engage-btn:hover {
+      color: var(--secondary);
+    }
+
+    .engage-icon {
+      font-size: 1.3rem;
+    }
+
+    .engage-btn.active .engage-icon {
+      color: var(--primary);
+      animation: pulse 0.4s;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    /* ===== SIDEBAR RIGHT ===== */
+    .sidebar-right {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px 8px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+
+    .search-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s;
+    }
+
+    .search-box:focus-within {
+      border-color: var(--secondary);
+      box-shadow: var(--glow-secondary);
+    }
+
+    .search-box input {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text);
+      outline: none;
+      font-size: 0.9rem;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .search-box input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .source-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .source-btn {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-align: center;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .source-btn:hover {
+      border-color: var(--secondary);
+      background: rgba(0, 247, 239, 0.08);
+    }
+
+    .source-btn.active {
+      background: linear-gradient(135deg, var(--primary), rgba(255, 0, 80, 0.5));
+      border-color: var(--primary);
+      color: var(--text);
+      box-shadow: var(--glow-primary);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .card-title {
+      font-size: 0.8rem;
+      font-weight: 900;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .trending-item {
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.25s;
+      margin-bottom: 8px;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .trending-item:hover {
+      background: rgba(0, 247, 239, 0.08);
+      transform: translateX(-4px);
+    }
+
+    .trending-tag {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--secondary);
+      margin-bottom: 3px;
+    }
+
+    .trending-count {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+
+    /* ===== MODAL ===== */
+    #sourceModal {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+    }
+
+    #sourceModal.hidden {
+      display: none;
+    }
+
+    .modal-box {
+      background: linear-gradient(135deg, var(--dark), rgba(20, 30, 60, 0.8));
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 0 60px rgba(255, 0, 80, 0.2);
+      text-align: center;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 900;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sources-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .source-option {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      padding: 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .source-option:hover {
+      border-color: var(--secondary);
+      background: rgba(0, 247, 239, 0.1);
+      transform: translateY(-3px);
+    }
+
+    .source-label {
+      font-size: 0.85rem;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 1024px) {
+      .main-grid {
+        grid-template-columns: 65px 1fr 0;
       }
-      .shell{display:none}
-      .feed{border-radius:0;min-height:100vh}
-      .card{height:100vh;min-height:100vh;border-radius:0;margin-bottom:0}
-      .topbar{position:sticky}
-      .poster{padding:16px}
-      .rightstack{position:absolute;right:12px;bottom:120px}
-      .feedlist{padding:0}
+      .sidebar-right {
+        display: none;
+      }
     }
 
-    @media (prefers-reduced-motion: reduce){
-      html{scroll-behavior:auto}
-      *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+    @media (max-width: 768px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+        padding: 0;
+        gap: 0;
+      }
+      .sidebar-left {
+        display: none;
+      }
+      .video-item {
+        border-radius: 0;
+        margin-bottom: 0;
+        min-height: 100vh;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <aside class="shell" aria-label="Navigation">
-      <div class="brand">🎬</div>
-      <div class="brandText">Viral Infinity</div>
-      <div class="dock" id="dock"></div>
-    </aside>
 
-    <main class="feed" id="feed">
-      <div class="topbar">
-        <div class="toprow">
-          <div class="search" role="search">
-            <span aria-hidden="true">🔎</span>
-            <input id="searchInput" placeholder="ابحث عن فيديو، creator، tag..." autocomplete="off" />
-          </div>
-          <div class="badge2" id="counter">0 فيديو</div>
-        </div>
+<canvas id="bg-canvas"></canvas>
 
-        <div class="subbar" id="chips"></div>
+<!-- LOADING -->
+<div id="loading">
+  <div class="loader-dot">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+  <div class="loader-text">VIRAL PRIME</div>
+</div>
 
-        <div class="toolbar" style="margin-top:10px">
-          <div class="pill active" data-sort="trending">ترند</div>
-          <div class="pill" data-sort="latest">الأحدث</div>
-          <div class="pill" data-sort="likes">الأكثر إعجابًا</div>
-          <div class="pill" data-sort="views">الأكثر مشاهدة</div>
-        </div>
-
-        <div class="progressWrap" aria-hidden="true"><div class="progress" id="progress"></div></div>
+<!-- SOURCE MODAL -->
+<div id="sourceModal">
+  <div class="modal-box">
+    <div class="modal-title">اختار مصدر الفيديوهات</div>
+    <div class="sources-grid">
+      <div class="source-option" onclick="selectSource('tiktok')">
+        <div>🎵</div>
+        <div class="source-label">TikTok</div>
       </div>
-
-      <div class="feedlist" id="feedList"></div>
-    </main>
-
-    <aside class="sidebar">
-      <div class="sect">
-        <h3>المصادر</h3>
-        <div class="grid2" id="sourceGrid"></div>
+      <div class="source-option" onclick="selectSource('youtube')">
+        <div>📺</div>
+        <div class="source-label">YouTube</div>
       </div>
-
-      <div class="sect">
-        <h3>تصفية سريعة</h3>
-        <div class="segment">
-          <button id="onlySaved">المحفوظات</button>
-          <button id="onlyLiked">الإعجابات</button>
-        </div>
+      <div class="source-option" onclick="selectSource('facebook')">
+        <div>👍</div>
+        <div class="source-label">Facebook</div>
       </div>
-
-      <div class="sect">
-        <h3>المقترحات السريعة</h3>
-        <div class="trend" id="trend"></div>
+      <div class="source-option" onclick="selectSource('instagram')">
+        <div>📸</div>
+        <div class="source-label">Instagram</div>
       </div>
+    </div>
+  </div>
+</div>
 
-      <div class="sect">
-        <h3>الإحصائيات</h3>
-        <div class="stats">
-          <div class="stat"><span>الفيديوهات</span><strong id="stCount">0</strong></div>
-          <div class="stat"><span>المحفوظات</span><strong id="stSaved">0</strong></div>
-          <div class="stat"><span>الإعجابات</span><strong id="stLiked">0</strong></div>
-          <div class="stat"><span>الوضع</span><strong id="stMode">جاهز</strong></div>
-        </div>
-      </div>
+<!-- MAIN -->
+<div class="main-grid">
 
-      <div class="sect">
-        <h3>اختصارات</h3>
-        <div class="hint">
-          <div>↑ ↓ للتنقل بين الكروت.</div>
-          <div><span class="kbd">/</span> للبحث.</div>
-          <div><span class="kbd">L</span> إعجاب، <span class="kbd">S</span> حفظ.</div>
-          <div><span class="kbd">Home</span> أول فيديو، <span class="kbd">End</span> آخر فيديو.</div>
-        </div>
-      </div>
-
-      <div class="sect">
-        <h3>مهم</h3>
-        <div class="hint">
-          الفيديو النشط فقط هو الذي يعمل، والباقي بيتوقف تلقائيًا. لو حطيت embeds رسمية أو ملفاتك المباشرة، الأداء هيبقى أهدى وأسرع.
-        </div>
-      </div>
-    </aside>
+  <!-- LEFT SIDEBAR -->
+  <div class="sidebar-left">
+    <div class="logo" onclick="location.reload()">🎥</div>
+    <div class="nav-btn active" onclick="switchNav(event, 'home')">🏠</div>
+    <div class="nav-btn" onclick="switchNav(event, 'trending')">🔥</div>
+    <div class="nav-btn" onclick="switchNav(event, 'music')">🎵</div>
+    <div class="nav-btn" onclick="switchNav(event, 'comedy')">😂</div>
+    <div class="nav-btn" onclick="switchNav(event, 'gaming')">🎮</div>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <!-- FEED CENTER -->
+  <div id="feed"></div>
 
-  <script>
-    const SOURCES = [
-      { id:'all', label:'الكل', icon:'✨' },
-      { id:'local', label:'محلي', icon:'📼' },
-      { id:'youtube', label:'YouTube', icon:'▶️' },
-      { id:'facebook', label:'Facebook', icon:'👥' },
-      { id:'tiktok', label:'TikTok', icon:'🎵' },
-    ];
+  <!-- RIGHT SIDEBAR -->
+  <div class="sidebar-right">
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" placeholder="ابحث..." onkeyup="searchVideos(this.value)">
+    </div>
 
-    const CATEGORIES = ['الكل','ترند','موسيقى','كوميديا','تعليم','ألعاب','فلوق'];
+    <div>
+      <div style="font-size: 0.8rem; font-weight: 900; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase;">المصدر</div>
+      <div class="source-selector">
+        <div class="source-btn active" onclick="changeSource('tiktok', event)">🎵 TikTok</div>
+        <div class="source-btn" onclick="changeSource('youtube', event)">📺 YouTube</div>
+        <div class="source-btn" onclick="changeSource('facebook', event)">👍 Facebook</div>
+        <div class="source-btn" onclick="changeSource('instagram', event)">📸 Instagram</div>
+      </div>
+    </div>
 
-    const ITEMS = [
-      {
-        id:1,
-        provider:'local',
-        category:'ترند',
-        author:'Viral Lab',
-        avatar:'V',
-        title:'واجهة سريعة جدًا على ستايل الفيديوهات العمودية',
-        desc:'فيديو محلي تجريبي يثبت إن الفيد شغال بسرعة ومن غير صوت متضارب.',
-        mediaUrl:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-        poster:'linear-gradient(135deg, #0f172a, #172554)',
-        views:154000,
-        likes:24000,
-        comments:1800,
-        tags:['خفيف','سريع','عمودي'],
-        createdAt:'2026-04-20'
-      },
-      {
-        id:2,
-        provider:'youtube',
-        category:'تعليم',
-        author:'YouTube Demo',
-        avatar:'Y',
-        title:'فيديو يوتيوب مع تحكم كامل في الإيقاف والتشغيل',
-        desc:'ده مثال يوتيوب. أول ما يتغير الكارد، الفيديو القديم بيتوقف من خلال التطبيق.',
-        youtubeId:'M7lc1UVf-VE',
-        poster:'linear-gradient(135deg, #111827, #1d4ed8)',
-        views:992000,
-        likes:110000,
-        comments:6300,
-        tags:['YouTube','API','تحكم'],
-        createdAt:'2026-04-19'
-      },
-      {
-        id:3,
-        provider:'local',
-        category:'موسيقى',
-        author:'Studio Wave',
-        avatar:'S',
-        title:'لو عايز سرعة حقيقية، ارفع ملفاتك أنت أو استريم خاص',
-        desc:'ده أفضل حل للأداء، لأن الفيديو المباشر أخف من أي embed خارجي.',
-        mediaUrl:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-        poster:'linear-gradient(135deg, #1f2937, #065f46)',
-        views:230000,
-        likes:39000,
-        comments:2100,
-        tags:['أداء','Stream','سريع'],
-        createdAt:'2026-04-18'
-      },
-      {
-        id:4,
-        provider:'facebook',
-        category:'فلوق',
-        author:'Facebook Embed',
-        avatar:'F',
-        title:'فيديو فيسبوك (ضع رابط embed الرسمي هنا)',
-        desc:'الواجهة جاهزة، بس لازم تحط embed URL رسمي صالح لفيديو عام.',
-        embedUrl:'',
-        poster:'linear-gradient(135deg, #0f172a, #7c3aed)',
-        views:410000,
-        likes:48000,
-        comments:3200,
-        tags:['Facebook','Embed','Public'],
-        createdAt:'2026-04-17'
-      },
-      {
-        id:5,
-        provider:'tiktok',
-        category:'كوميديا',
-        author:'TikTok Style',
-        avatar:'T',
-        title:'TikTok item placeholder',
-        desc:'مكان جاهز لأي TikTok embed رسمي أو رابط محتوى مسموح.',
-        embedUrl:'',
-        poster:'linear-gradient(135deg, #111827, #db2777)',
-        views:870000,
-        likes:125000,
-        comments:9200,
-        tags:['TikTok','Shorts','Feed'],
-        createdAt:'2026-04-16'
-      },
-      {
-        id:6,
-        provider:'youtube',
-        category:'ألعاب',
-        author:'YouTube Demo 2',
-        avatar:'G',
-        title:'كارد يوتيوب تاني للتبديل السريع بين أكثر من مصدر',
-        desc:'التبديل هنا ينضف القلوب كلها: player واحد فقط نشط، والباقي متشال.',
-        youtubeId:'dQw4w9WgXcQ',
-        poster:'linear-gradient(135deg, #1f2937, #991b1b)',
-        views:2200000,
-        likes:310000,
-        comments:19000,
-        tags:['Switch','Mute','Clean'],
-        createdAt:'2026-04-15'
-      },
-      {
-        id:7,
-        provider:'local',
-        category:'تعليم',
-        author:'UI Mentor',
-        avatar:'U',
-        title:'تصميم نظيف مع قراءة سريعة للمحتوى',
-        desc:'كل حاجة هنا متقسمة بوضوح: مصدر، فئة، بحث، وعناصر تفاعل بسيطة.',
-        mediaUrl:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-        poster:'linear-gradient(135deg, #312e81, #1f2937)',
-        views:540000,
-        likes:70000,
-        comments:4100,
-        tags:['Design','UX','RTL'],
-        createdAt:'2026-04-14'
-      },
-      {
-        id:8,
-        provider:'local',
-        category:'ترند',
-        author:'Fast Feed',
-        avatar:'F',
-        title:'الكارد النشط فقط هو اللي يشتغل',
-        desc:'ده بيوفر الرام وبيقلل اللخبطة خصوصًا على الموبايل.',
-        mediaUrl:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-        poster:'linear-gradient(135deg, #3f1d53, #0f172a)',
-        views:780000,
-        likes:100000,
-        comments:7100,
-        tags:['One Active','Smooth','Mobile'],
-        createdAt:'2026-04-13'
-      }
-    ];
+    <div class="card">
+      <div class="card-title">🔥 الأكثر مشاهدة</div>
+      <div id="trending"></div>
+    </div>
 
-    const state = {
-      source:'all',
-      category:'الكل',
-      query:'',
-      sort:'trending',
-      onlySaved:false,
-      onlyLiked:false,
-      saved:new Set(JSON.parse(localStorage.getItem('vi_saved') || '[]')),
-      liked:new Set(JSON.parse(localStorage.getItem('vi_liked') || '[]')),
-      activeIndex:-1,
-      players:new Map(),
-      ytQueue:[],
-      ytLoaded:false
-    };
+    <div class="card">
+      <div class="card-title">⚙️ خيارات</div>
+      <div style="font-size: 0.9rem; color: var(--text-dim); line-height: 1.5;">
+        <div style="padding: 8px; margin-bottom: 8px; background: rgba(0,247,239,0.05); border-radius: 8px; cursor: pointer;" onclick="toggleAutoplay()">▶️ تشغيل تلقائي</div>
+        <div style="padding: 8px; background: rgba(0,247,239,0.05); border-radius: 8px; cursor: pointer;" onclick="toggleSound()">🔊 الصوت</div>
+      </div>
+    </div>
+  </div>
 
-    const feed = document.getElementById('feed');
-    const feedList = document.getElementById('feedList');
-    const searchInput = document.getElementById('searchInput');
-    const counter = document.getElementById('counter');
-    const dock = document.getElementById('dock');
-    const sourceGrid = document.getElementById('sourceGrid');
-    const chips = document.getElementById('chips');
-    const trend = document.getElementById('trend');
-    const toast = document.getElementById('toast');
-    const progress = document.getElementById('progress');
+</div>
 
-    const stCount = document.getElementById('stCount');
-    const stSaved = document.getElementById('stSaved');
-    const stLiked = document.getElementById('stLiked');
-    const stMode = document.getElementById('stMode');
-    const onlySavedBtn = document.getElementById('onlySaved');
-    const onlyLikedBtn = document.getElementById('onlyLiked');
+<script>
+// ===== CONFIG =====
+const VIDEOS_DATA = [
+  // TikTok Videos (embed codes)
+  { id: 1, source: 'tiktok', title: 'فيديو تيك توك رائع', channel: 'Creator 1', avatar: 'C', link: 'https://www.tiktok.com/@creator1/video/1234567890' },
+  { id: 2, source: 'youtube', title: 'فيديو يوتيوب مميز', channel: 'Creator 2', avatar: 'C', videoId: 'dQw4w9WgXcQ' },
+  { id: 3, source: 'tiktok', title: 'فيديو تيك توك مضحك', channel: 'Creator 3', avatar: 'C', link: 'https://www.tiktok.com/@creator3/video/1234567891' },
+  { id: 4, source: 'facebook', title: 'فيديو فيس بوك جميل', channel: 'Creator 4', avatar: 'C', fbLink: 'https://www.facebook.com/watch/?v=1234567890' },
+  { id: 5, source: 'instagram', title: 'فيديو إنستجرام رايق', channel: 'Creator 5', avatar: 'C', igLink: 'https://www.instagram.com/reel/ABC123/' },
+  { id: 6, source: 'youtube', title: 'فيديو يوتيوب آخر', channel: 'Creator 6', avatar: 'C', videoId: 'jNQXAC9IVRw' },
+  { id: 7, source: 'tiktok', title: 'فيديو تيك توك موسيقي', channel: 'Creator 7', avatar: 'C', link: 'https://www.tiktok.com/@creator7/video/1234567892' },
+  { id: 8, source: 'youtube', title: 'فيديو يوتيوب تعليمي', channel: 'Creator 8', avatar: 'C', videoId: '9bZkp7q19f0' },
+];
 
-    function showToast(msg){
-      toast.textContent = msg;
-      toast.classList.add('show');
-      clearTimeout(showToast.t);
-      showToast.t = setTimeout(()=>toast.classList.remove('show'), 1500);
-    }
+// ===== STATE =====
+let currentSource = 'tiktok';
+let currentIndex = 0;
+let filteredVideos = VIDEOS_DATA.filter(v => v.source === 'tiktok');
+let autoplay = true;
+let soundOn = true;
+let currentAudio = null;
 
-    function formatNumber(n){
-      if(n >= 1000000) return (n/1000000).toFixed(1) + 'م';
-      if(n >= 1000) return (n/1000).toFixed(1) + 'ك';
-      return String(n);
-    }
+// ===== INIT =====
+window.addEventListener('load', () => {
+  initCanvas();
+  setTimeout(() => {
+    document.getElementById('loading').classList.add('hidden');
+    loadFeed();
+    updateTrending();
+  }, 800);
+});
 
-    function bySort(items){
-      const copy = [...items];
-      if(state.sort === 'latest') return copy.sort((a,b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-      if(state.sort === 'likes') return copy.sort((a,b) => b.likes - a.likes);
-      if(state.sort === 'views') return copy.sort((a,b) => b.views - a.views);
-      return copy.sort((a,b) => (b.views * 0.55 + b.likes * 0.35 + b.comments * 0.1) - (a.views * 0.55 + a.likes * 0.35 + a.comments * 0.1));
-    }
+// ===== CANVAS BG =====
+function initCanvas() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
 
-    function matches(item){
-      const matchesSource = state.source === 'all' || item.provider === state.source;
-      const matchesCategory = state.category === 'الكل' || item.category === state.category;
-      const q = state.query.trim().toLowerCase();
-      const hay = [item.title, item.desc, item.author, item.category, ...(item.tags || [])].join(' ').toLowerCase();
-      const matchesQuery = !q || hay.includes(q);
-      const matchesSaved = !state.onlySaved || state.saved.has(item.id);
-      const matchesLiked = !state.onlyLiked || state.liked.has(item.id);
-      return matchesSource && matchesCategory && matchesQuery && matchesSaved && matchesLiked;
-    }
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
 
-    function filteredItems(){
-      return bySort(ITEMS.filter(matches));
-    }
+  for(let i = 0; i < 80; i++) {
+    particles.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 1.5 + 0.5,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      a: Math.random() * 0.5
+    });
+  }
 
-    function persist(){
-      try{
-        localStorage.setItem('vi_saved', JSON.stringify([...state.saved]));
-        localStorage.setItem('vi_liked', JSON.stringify([...state.liked]));
-      }catch(e){}
-    }
+  function draw() {
+    ctx.fillStyle = 'rgba(10, 14, 39, 0.05)';
+    ctx.fillRect(0, 0, w, h);
 
-    function renderSources(){
-      dock.innerHTML = '';
-      sourceGrid.innerHTML = '';
-      SOURCES.forEach(src => {
-        const b1 = document.createElement('button');
-        b1.type = 'button';
-        b1.innerHTML = src.icon;
-        if(state.source === src.id) b1.classList.add('active');
-        b1.onclick = () => setSource(src.id);
-        dock.appendChild(b1);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.a += 0.01;
 
-        const b2 = document.createElement('div');
-        b2.className = 'mini' + (state.source === src.id ? ' active' : '');
-        b2.textContent = `${src.icon} ${src.label}`;
-        b2.onclick = () => setSource(src.id);
-        sourceGrid.appendChild(b2);
-      });
-    }
+      if(p.x < 0) p.x = w;
+      if(p.x > w) p.x = 0;
+      if(p.y < 0) p.y = h;
+      if(p.y > h) p.y = 0;
 
-    function renderCategories(){
-      chips.innerHTML = '';
-      CATEGORIES.forEach(cat => {
-        const el = document.createElement('div');
-        el.className = 'chip' + (state.category === cat ? ' active' : '');
-        el.textContent = cat;
-        el.onclick = () => {
-          state.category = cat;
-          state.activeIndex = -1;
-          renderAll(true);
-          showToast(`تم اختيار: ${cat}`);
-        };
-        chips.appendChild(el);
-      });
-    }
-
-    function renderTrend(){
-      const list = [
-        ['#فيديو_سريع', 'محتوى خفيف وسلس'],
-        ['#تعليم_قصير', 'تعلم في ثواني'],
-        ['#ترند_اليوم', 'أكثر ما يُشاهد الآن'],
-        ['#منظم_وشيك', 'واجهة نظيفة'],
-      ];
-      trend.innerHTML = '';
-      list.forEach(([tag, sub]) => {
-        const item = document.createElement('div');
-        item.className = 'trenditem';
-        item.innerHTML = `
-          <div class="trendtop">
-            <div class="trendtag">${tag}</div>
-            <div>↗</div>
-          </div>
-          <div class="trendsub">${sub}</div>
-        `;
-        item.onclick = () => {
-          state.query = tag.replace('#', '');
-          searchInput.value = state.query;
-          state.activeIndex = -1;
-          renderAll(true);
-          showToast(`بحث: ${tag}`);
-        };
-        trend.appendChild(item);
-      });
-    }
-
-    function setSource(src){
-      state.source = src;
-      state.activeIndex = -1;
-      renderAll(true);
-      showToast(`المصدر: ${src === 'all' ? 'الكل' : src}`);
-    }
-
-    function cardTemplate(item, index){
-      const liked = state.liked.has(item.id);
-      const saved = state.saved.has(item.id);
-      const likesShown = item.likes + (liked ? 1 : 0);
-      return `
-        <section class="card" data-index="${index}" data-id="${item.id}">
-          <div class="media" data-media></div>
-          <div class="poster" data-poster style="--poster:${item.poster || ''}">
-            <div class="meta">
-              <div class="line1">
-                <div class="badge">${item.avatar || '▶️'}</div>
-                <div>
-                  <div class="author">${item.author} · <span class="sub">${item.provider.toUpperCase()}</span></div>
-                  <div class="sub">${formatNumber(item.views)} مشاهدة · ${formatNumber(likesShown)} إعجاب · ${formatNumber(item.comments)} تعليق</div>
-                </div>
-              </div>
-              <div class="title">${item.title}</div>
-              <div class="desc">${item.desc || ''}</div>
-              <div class="tags">${(item.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}</div>
-            </div>
-
-            <div class="rightstack">
-              <div class="action" data-like title="إعجاب">
-                <div class="stackcol">
-                  <div class="ico">${liked ? '❤️' : '🤍'}</div>
-                  <span>${formatNumber(likesShown)}</span>
-                </div>
-              </div>
-              <div class="action" data-save title="حفظ">
-                <div class="stackcol">
-                  <div class="ico">${saved ? '🔖' : '📌'}</div>
-                  <span>${saved ? 'حُفظ' : 'حفظ'}</span>
-                </div>
-              </div>
-              <div class="action" data-share title="مشاركة">
-                <div class="stackcol">
-                  <div class="ico">📤</div>
-                  <span>شارك</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      `;
-    }
-
-    function renderFeed(){
-      const items = filteredItems();
-      counter.textContent = `${items.length} فيديو`;
-      stCount.textContent = items.length;
-      stSaved.textContent = state.saved.size;
-      stLiked.textContent = state.liked.size;
-      stMode.textContent = state.onlySaved ? 'المحفوظات' : state.onlyLiked ? 'الإعجابات' : 'جاهز';
-
-      if(!items.length){
-        feedList.innerHTML = `
-          <div class="empty">
-            <div class="box">
-              <h2>مفيش نتائج</h2>
-              <div>جرّب تغيّر المصدر أو الفئة أو البحث.</div>
-            </div>
-          </div>
-        `;
-        attachObserver();
-        return;
-      }
-
-      feedList.innerHTML = items.map(cardTemplate).join('');
-      feedList.querySelectorAll('.card').forEach((card, idx) => {
-        const item = items[idx];
-
-        card.querySelector('[data-like]').onclick = () => {
-          if(state.liked.has(item.id)) state.liked.delete(item.id);
-          else state.liked.add(item.id);
-          persist();
-          renderAll(false);
-          showToast(state.liked.has(item.id) ? 'اتعمل إعجاب' : 'اتشال الإعجاب');
-        };
-
-        card.querySelector('[data-save]').onclick = () => {
-          if(state.saved.has(item.id)) state.saved.delete(item.id);
-          else state.saved.add(item.id);
-          persist();
-          renderAll(false);
-          showToast(state.saved.has(item.id) ? 'اتحفظ' : 'اتشال من المحفوظات');
-        };
-
-        card.querySelector('[data-share]').onclick = async () => {
-          const text = `شاهد: ${item.title}`;
-          try{
-            if(navigator.share){
-              await navigator.share({ title:'VIRAL INFINITY', text });
-            }else if(navigator.clipboard){
-              await navigator.clipboard.writeText(text);
-              showToast('اتنسخ نص المشاركة');
-            }else{
-              showToast('المشاركة غير مدعومة هنا');
-            }
-          }catch(e){}
-        };
-      });
-
-      attachObserver();
-      updateStats();
-    }
-
-    function updateStats(){
-      stCount.textContent = filteredItems().length;
-      stSaved.textContent = state.saved.size;
-      stLiked.textContent = state.liked.size;
-      stMode.textContent = state.onlySaved ? 'المحفوظات' : state.onlyLiked ? 'الإعجابات' : 'جاهز';
-    }
-
-    function cleanupMedia(card){
-      if(!card) return;
-      const media = card.querySelector('[data-media]');
-      if(!media) return;
-
-      const kind = media.dataset.kind;
-      const ytId = media.dataset.yt;
-
-      if(kind === 'video'){
-        const v = media.querySelector('video');
-        if(v){
-          try{ v.pause(); }catch(e){}
-          v.removeAttribute('src');
-          v.load();
-        }
-      }
-
-      if(kind === 'youtube' && ytId && state.players.has(ytId)){
-        const player = state.players.get(ytId);
-        try{ player.stopVideo(); }catch(e){}
-        try{ player.destroy(); }catch(e){}
-        state.players.delete(ytId);
-      }
-
-      media.innerHTML = '';
-      delete media.dataset.kind;
-      delete media.dataset.yt;
-      const poster = card.querySelector('[data-poster]');
-      if(poster) poster.classList.remove('hidden');
-    }
-
-    function loadLocalVideo(card, item){
-      const media = card.querySelector('[data-media]');
-      media.dataset.kind = 'video';
-      media.innerHTML = `
-        <video playsinline preload="metadata" muted loop controls>
-          <source src="${item.mediaUrl}" type="video/mp4">
-        </video>
-      `;
-      const video = media.querySelector('video');
-      video.play().catch(()=>{});
-    }
-
-    function loadYoutubeVideo(card, item){
-      const media = card.querySelector('[data-media]');
-      media.dataset.kind = 'youtube';
-      media.dataset.yt = item.youtubeId;
-      media.innerHTML = `<div id="yt-${item.id}" style="width:100%;height:100%"></div>`;
-
-      const mount = () => {
-        if(!window.YT || !window.YT.Player){
-          state.ytQueue.push(() => mount());
-          return;
-        }
-        const player = new YT.Player(`yt-${item.id}`, {
-          videoId:item.youtubeId,
-          playerVars:{
-            autoplay:1,
-            mute:1,
-            controls:0,
-            playsinline:1,
-            rel:0,
-            modestbranding:1,
-            loop:0,
-            fs:0,
-            iv_load_policy:3
-          },
-          events:{
-            onReady:(e) => {
-              try{ e.target.mute(); e.target.playVideo(); }catch(err){}
-            }
-          }
-        });
-        state.players.set(item.youtubeId, player);
-      };
-
-      mount();
-    }
-
-    function loadEmbed(card, item){
-      const media = card.querySelector('[data-media]');
-      media.dataset.kind = 'embed';
-      if(item.embedUrl && item.embedUrl.trim()){
-        media.innerHTML = `<iframe src="${item.embedUrl}" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
-      }else{
-        media.innerHTML = `
-          <div style="width:100%;height:100%;display:grid;place-items:center;background:linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.01));padding:24px;text-align:center;">
-            <div style="max-width:420px">
-              <div style="font-size:3rem;margin-bottom:10px">⚠️</div>
-              <div style="font-size:22px;font-weight:900;margin-bottom:10px">ضع embed رسمي هنا</div>
-              <div style="color:rgba(247,251,255,.72);line-height:1.8">لو حطيت رابط embed صالح للفيديو العام، الكارد ده هيشتغل فورًا.</div>
-            </div>
-          </div>
-        `;
-      }
-    }
-
-    function mountActive(index){
-      const cards = [...feedList.querySelectorAll('.card')];
-      const card = cards[index];
-      if(!card || index === state.activeIndex) return;
-
-      const prev = cards[state.activeIndex];
-      if(prev) cleanupMedia(prev);
-
-      state.activeIndex = index;
-      const item = filteredItems()[index];
-      const poster = card.querySelector('[data-poster]');
-      if(poster) poster.classList.add('hidden');
-
-      if(item.provider === 'local') loadLocalVideo(card, item);
-      else if(item.provider === 'youtube') loadYoutubeVideo(card, item);
-      else loadEmbed(card, item);
-    }
-
-    function attachObserver(){
-      if(window.__io) window.__io.disconnect();
-      const cards = [...feedList.querySelectorAll('.card')];
-      if(!cards.length) return;
-
-      const io = new IntersectionObserver((entries) => {
-        let best = null;
-        entries.forEach(entry => {
-          if(entry.isIntersecting && (!best || entry.intersectionRatio > best.intersectionRatio)){
-            best = entry;
-          }
-        });
-        if(best){
-          mountActive(Number(best.target.dataset.index));
-        }
-      }, { root: feed, threshold:[0.35, 0.5, 0.65, 0.8] });
-
-      cards.forEach(c => io.observe(c));
-      window.__io = io;
-
-      setTimeout(() => {
-        if(cards.length) mountActive(0);
-      }, 120);
-    }
-
-    function renderAll(reset = false){
-      renderSources();
-      renderCategories();
-      renderTrend();
-      renderFeed();
-      if(reset) feed.scrollTop = 0;
-      updateStats();
-      syncButtons();
-    }
-
-    function syncButtons(){
-      document.querySelectorAll('.pill').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.sort === state.sort);
-      });
-      onlySavedBtn.classList.toggle('active', state.onlySaved);
-      onlyLikedBtn.classList.toggle('active', state.onlyLiked);
-    }
-
-    function setSort(sort){
-      state.sort = sort;
-      renderAll(false);
-      showToast(`الترتيب: ${sort}`);
-    }
-
-    function loadYouTubeAPI(){
-      return new Promise((resolve) => {
-        if(window.YT && window.YT.Player){
-          state.ytLoaded = true;
-          resolve();
-          return;
-        }
-        const existing = document.querySelector('script[data-yt-api]');
-        if(existing){
-          resolve();
-          return;
-        }
-        const tag = document.createElement('script');
-        tag.src = 'https://www.youtube.com/iframe_api';
-        tag.dataset.ytApi = '1';
-        window.onYouTubeIframeAPIReady = () => {
-          state.ytLoaded = true;
-          while(state.ytQueue.length) (state.ytQueue.shift())();
-          resolve();
-        };
-        document.head.appendChild(tag);
-      });
-    }
-
-    function jumpActive(delta){
-      const cards = [...feedList.querySelectorAll('.card')];
-      if(!cards.length) return;
-      const next = Math.max(0, Math.min(cards.length - 1, (state.activeIndex < 0 ? 0 : state.activeIndex) + delta));
-      cards[next].scrollIntoView({ behavior:'smooth', block:'start' });
-      mountActive(next);
-    }
-
-    function toggleQuickFilter(type){
-      if(type === 'saved'){
-        state.onlySaved = !state.onlySaved;
-        if(state.onlySaved) state.onlyLiked = false;
-      }
-      if(type === 'liked'){
-        state.onlyLiked = !state.onlyLiked;
-        if(state.onlyLiked) state.onlySaved = false;
-      }
-      renderAll(true);
-      showToast(state.onlySaved ? 'عرض المحفوظات فقط' : state.onlyLiked ? 'عرض الإعجابات فقط' : 'إلغاء الفلاتر السريعة');
-    }
-
-    searchInput.addEventListener('input', (e) => {
-      state.query = e.target.value;
-      state.activeIndex = -1;
-      renderAll(true);
+      const alpha = 0.3 + 0.2 * Math.abs(Math.sin(p.a));
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0, 247, 239, ${alpha})`;
+      ctx.fill();
     });
 
-    onlySavedBtn.addEventListener('click', () => toggleQuickFilter('saved'));
-    onlyLikedBtn.addEventListener('click', () => toggleQuickFilter('liked'));
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
 
-    document.querySelectorAll('.pill').forEach(btn => {
-      btn.addEventListener('click', () => setSort(btn.dataset.sort));
-    });
+// ===== LOAD FEED =====
+function loadFeed() {
+  const feed = document.getElementById('feed');
+  feed.innerHTML = '';
 
-    let progressTimer = null;
-    feed.addEventListener('scroll', () => {
-      clearTimeout(progressTimer);
-      const max = feed.scrollHeight - feed.clientHeight;
-      const ratio = max > 0 ? Math.min(1, Math.max(0, feed.scrollTop / max)) : 0;
-      progress.style.width = `${ratio * 100}%`;
-      progressTimer = setTimeout(() => {}, 60);
-    }, { passive:true });
+  filteredVideos.forEach((video, idx) => {
+    const item = document.createElement('div');
+    item.className = 'video-item';
+    
+    let playerHTML = '';
+    if(video.source === 'youtube' && video.videoId) {
+      playerHTML = `<iframe src="https://www.youtube.com/embed/${video.videoId}?modestbranding=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    } else if(video.source === 'tiktok') {
+      playerHTML = `<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #000; flex-direction: column; color: #fff; gap: 15px;">
+        <div style="font-size: 3rem;">🎵</div>
+        <div style="text-align: center;">
+          <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;">فيديو TikTok</div>
+          <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 15px;">اضغط للفتح على TikTok</div>
+          <a href="${video.link}" target="_blank" style="background: linear-gradient(135deg, #ff0050, #ff006e); color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: 700; display: inline-block;">فتح الفيديو</a>
+        </div>
+      </div>`;
+    } else if(video.source === 'facebook') {
+      playerHTML = `<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #000; flex-direction: column; color: #fff; gap: 15px;">
+        <div style="font-size: 3rem;">👍</div>
+        <div style="text-align: center;">
+          <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;">فيديو Facebook</div>
+          <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 15px;">اضغط للفتح على Facebook</div>
+          <a href="${video.fbLink}" target="_blank" style="background: #1877f2; color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: 700; display: inline-block;">فتح الفيديو</a>
+        </div>
+      </div>`;
+    } else if(video.source === 'instagram') {
+      playerHTML = `<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #000; flex-direction: column; color: #fff; gap: 15px;">
+        <div style="font-size: 3rem;">📸</div>
+        <div style="text-align: center;">
+          <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;">فيديو Instagram</div>
+          <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 15px;">اضغط للفتح على Instagram</div>
+          <a href="${video.igLink}" target="_blank" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: 700; display: inline-block;">فتح الفيديو</a>
+        </div>
+      </div>`;
+    }
 
-    document.addEventListener('visibilitychange', () => {
-      if(document.hidden){
-        const prev = feedList.querySelectorAll('.card')[state.activeIndex];
-        if(prev) cleanupMedia(prev);
-      }
-    });
+    item.innerHTML = `
+      <div class="video-player">
+        ${playerHTML}
+        <div class="video-overlay"></div>
+        <div class="video-controls">
+          <button class="control-btn" onclick="toggleLike(this)">❤️</button>
+          <button class="control-btn" onclick="shareVideo('${video.title}')">📤</button>
+          <button class="control-btn" onclick="bookmarkVideo(this)">🔖</button>
+          <button class="control-btn" onclick="toggleMute(this)">🔊</button>
+        </div>
+        <div class="video-info">
+          <div class="channel-row">
+            <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+              <div class="avatar">${video.avatar}</div>
+              <div class="channel-info">
+                <div class="channel-name">${video.channel}</div>
+                <div class="channel-meta">المزيد من الفيديوهات</div>
+              </div>
+            </div>
+            <button class="follow-btn" onclick="follow(this)">متابعة</button>
+          </div>
+          <div class="video-desc">${video.title}</div>
+          <div class="engagement-row">
+            <div class="engage-btn" onclick="engage(this, 'like')"><div class="engage-icon">❤️</div><span>إعجاب</span></div>
+            <div class="engage-btn" onclick="engage(this, 'comment')"><div class="engage-icon">💬</div><span>تعليق</span></div>
+            <div class="engage-btn" onclick="engage(this, 'share')"><div class="engage-icon">📤</div><span>شارك</span></div>
+          </div>
+        </div>
+      </div>
+    `;
 
-    document.addEventListener('keydown', (e) => {
-      if(e.key === '/' && document.activeElement !== searchInput){
-        e.preventDefault();
-        searchInput.focus();
-        return;
-      }
+    feed.appendChild(item);
+  });
 
-      if(document.activeElement === searchInput && e.key === 'Escape'){
-        searchInput.blur();
-        return;
-      }
-
-      if(e.key === 'ArrowDown'){
-        e.preventDefault();
-        jumpActive(1);
-      }
-      if(e.key === 'ArrowUp'){
-        e.preventDefault();
-        jumpActive(-1);
-      }
-      if(e.key === 'Home'){
-        e.preventDefault();
-        const cards = [...feedList.querySelectorAll('.card')];
-        if(cards.length) cards[0].scrollIntoView({ behavior:'smooth', block:'start' });
-      }
-      if(e.key === 'End'){
-        e.preventDefault();
-        const cards = [...feedList.querySelectorAll('.card')];
-        if(cards.length) cards[cards.length - 1].scrollIntoView({ behavior:'smooth', block:'start' });
-      }
-
-      const lower = e.key.toLowerCase();
-      if(lower === 'l'){
-        const item = filteredItems()[state.activeIndex];
-        if(item){
-          if(state.liked.has(item.id)) state.liked.delete(item.id);
-          else state.liked.add(item.id);
-          persist();
-          renderAll(false);
-          showToast(state.liked.has(item.id) ? 'اتعمل إعجاب' : 'اتشال الإعجاب');
-        }
-      }
-      if(lower === 's'){
-        const item = filteredItems()[state.activeIndex];
-        if(item){
-          if(state.saved.has(item.id)) state.saved.delete(item.id);
-          else state.saved.add(item.id);
-          persist();
-          renderAll(false);
-          showToast(state.saved.has(item.id) ? 'اتحفظ' : 'اتشال من المحفوظات');
+  // IntersectionObserver for audio control
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const video = entry.target.querySelector('iframe');
+      if(entry.isIntersecting) {
+        // Video is in view - could enable audio
+      } else {
+        // Video is out of view - stop all audio
+        if(currentAudio) {
+          currentAudio.pause();
+          currentAudio = null;
         }
       }
     });
+  }, { threshold: 0.5 });
 
-    window.addEventListener('beforeunload', persist);
+  document.querySelectorAll('.video-item').forEach(item => {
+    observer.observe(item);
+  });
+}
 
-    renderAll(true);
-    loadYouTubeAPI();
-    syncButtons();
-    showToast('النسخة المطورة جاهزة');
-  </script>
+// ===== INTERACTIONS =====
+function engage(el, type) {
+  el.classList.add('active');
+  setTimeout(() => el.classList.remove('active'), 400);
+}
+
+function toggleLike(btn) {
+  btn.classList.toggle('active');
+}
+
+function toggleMute(btn) {
+  btn.classList.toggle('active');
+  soundOn = !soundOn;
+}
+
+function shareVideo(title) {
+  const text = `شاهد هذا الفيديو الرائع: ${title}\n\n🎥 VIRAL PRIME\nhttps://viralprime.com`;
+  if(navigator.share) {
+    navigator.share({title: 'VIRAL PRIME', text}).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(text);
+    alert('تم نسخ الفيديو!');
+  }
+}
+
+function bookmarkVideo(btn) {
+  btn.classList.toggle('active');
+}
+
+function follow(btn) {
+  btn.textContent = '✓ متابع';
+  btn.style.opacity = '0.6';
+  setTimeout(() => {
+    btn.textContent = 'متابعة';
+    btn.style.opacity = '1';
+  }, 2000);
+}
+
+// ===== SOURCE CONTROL =====
+function changeSource(source, event) {
+  document.querySelectorAll('.source-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  currentSource = source;
+  filteredVideos = VIDEOS_DATA.filter(v => v.source === source);
+  currentIndex = 0;
+  loadFeed();
+  updateTrending();
+}
+
+function selectSource(source) {
+  currentSource = source;
+  filteredVideos = VIDEOS_DATA.filter(v => v.source === source);
+  document.getElementById('sourceModal').classList.add('hidden');
+  loadFeed();
+}
+
+// ===== SEARCH =====
+function searchVideos(query) {
+  if(query.length < 2) {
+    filteredVideos = VIDEOS_DATA.filter(v => v.source === currentSource);
+  } else {
+    filteredVideos = VIDEOS_DATA.filter(v => 
+      v.source === currentSource && 
+      (v.title.includes(query) || v.channel.includes(query))
+    );
+  }
+  loadFeed();
+}
+
+// ===== NAVIGATION =====
+function switchNav(event, type) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  // Filter by category
+  loadFeed();
+}
+
+// ===== TRENDING =====
+function updateTrending() {
+  const trending = [
+    { tag: '#فيديوهات_حصرية', count: '450K' },
+    { tag: '#محتوى_طازج', count: '320K' },
+    { tag: '#أكثر_مشاهدة', count: '680K' },
+    { tag: '#فيديو_اليوم', count: '250K' },
+  ];
+
+  const trendingDiv = document.getElementById('trending');
+  trendingDiv.innerHTML = trending.map(t => `
+    <div class="trending-item" onclick="searchVideos('${t.tag}')">
+      <div class="trending-tag">${t.tag}</div>
+      <div class="trending-count">${t.count} مشاهدة</div>
+    </div>
+  `).join('');
+}
+
+// ===== OPTIONS =====
+function toggleAutoplay() {
+  autoplay = !autoplay;
+  alert(autoplay ? '▶️ التشغيل التلقائي مفعّل' : '⏸️ التشغيل التلقائي معطّل');
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  alert(soundOn ? '🔊 الصوت مفعّل' : '🔇 الصوت معطّل');
+}
+</script>
+
 </body>
 </html>
