@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>🎥 VIRAL PRIME - أفضل منصة فيديوهات</title>
+  <title>VIRAL PRIME - تيك توك الأسطوري</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -12,12 +12,10 @@
       --tertiary: #ffd700;
       --dark: #0a0e27;
       --darker: #050812;
-      --card: rgba(20, 30, 60, 0.5);
-      --border: rgba(0, 247, 239, 0.1);
+      --card: rgba(15, 25, 55, 0.6);
+      --border: rgba(0, 247, 239, 0.12);
       --text: #ffffff;
-      --text-dim: rgba(255,255,255,0.4);
-      --glow-primary: 0 0 25px rgba(255, 0, 80, 0.35);
-      --glow-secondary: 0 0 25px rgba(0, 247, 239, 0.25);
+      --text-dim: rgba(255,255,255,0.45);
     }
 
     * {
@@ -30,21 +28,19 @@
     html, body {
       width: 100%;
       height: 100%;
-      overflow: hidden;
       font-family: 'Cairo', sans-serif;
       background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
       color: var(--text);
+      overflow: hidden;
     }
 
-    /* ===== BG ===== */
-    #bg-canvas {
+    canvas {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
       z-index: 0;
-      pointer-events: none;
     }
 
-    /* ===== LOADING ===== */
     #loading {
       position: fixed;
       inset: 0;
@@ -63,55 +59,27 @@
       transition: opacity 0.4s;
     }
 
-    .loader-dot {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .dot {
-      width: 10px;
-      height: 10px;
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid var(--border);
+      border-top: 3px solid var(--primary);
       border-radius: 50%;
-      background: var(--primary);
-      animation: bounce 1.4s infinite;
+      animation: spin 1s linear infinite;
     }
 
-    .dot:nth-child(2) {
-      animation-delay: 0.2s;
-      background: var(--secondary);
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .dot:nth-child(3) {
-      animation-delay: 0.4s;
-      background: var(--tertiary);
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: scale(0.8); opacity: 0.5; }
-      50% { transform: scale(1.3); opacity: 1; }
-    }
-
-    .loader-text {
-      color: var(--secondary);
-      font-weight: 900;
-      letter-spacing: 2px;
-      font-size: 0.9rem;
-    }
-
-    /* ===== MAIN LAYOUT ===== */
-    .main-grid {
+    .app {
       display: grid;
-      grid-template-columns: 70px 1fr 300px;
+      grid-template-columns: 70px 1fr 320px;
       height: 100vh;
-      gap: 8px;
-      padding: 8px;
+      gap: 10px;
+      padding: 10px;
       position: relative;
       z-index: 2;
     }
 
-    /* ===== SIDEBAR LEFT ===== */
     .sidebar-left {
       display: flex;
       flex-direction: column;
@@ -120,54 +88,50 @@
       padding: 10px 0;
     }
 
-    .logo {
+    .logo-btn {
       width: 60px;
       height: 60px;
       background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border: none;
       border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       font-size: 1.8rem;
       cursor: pointer;
       transition: all 0.3s;
-      box-shadow: var(--glow-primary);
+      box-shadow: 0 0 20px rgba(255, 0, 80, 0.3);
     }
 
-    .logo:hover {
+    .logo-btn:hover {
       transform: scale(1.1) rotate(-5deg);
     }
 
-    .nav-btn {
+    .nav-item {
       width: 55px;
       height: 55px;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 14px;
+      font-size: 1.3rem;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.3rem;
-      cursor: pointer;
       transition: all 0.25s;
       color: var(--text-dim);
     }
 
-    .nav-btn:hover {
+    .nav-item:hover {
       background: rgba(0, 247, 239, 0.08);
       border-color: var(--secondary);
       color: var(--secondary);
       transform: translateY(-3px);
     }
 
-    .nav-btn.active {
+    .nav-item.active {
       background: linear-gradient(135deg, var(--primary), rgba(255, 0, 80, 0.5));
       border-color: var(--primary);
       color: var(--text);
-      box-shadow: var(--glow-primary);
     }
 
-    /* ===== FEED ===== */
     #feed {
       position: relative;
       height: 100%;
@@ -180,18 +144,16 @@
       padding: 4px;
     }
 
-    #feed::-webkit-scrollbar {
-      display: none;
-    }
+    #feed::-webkit-scrollbar { display: none; }
 
-    .video-item {
+    .video-post {
       height: 100%;
-      min-height: 620px;
+      min-height: 650px;
       scroll-snap-align: start;
       position: relative;
       border-radius: 18px;
       overflow: hidden;
-      background: var(--card);
+      background: #000;
       border: 1px solid var(--border);
       display: flex;
       flex-direction: column;
@@ -200,10 +162,10 @@
     .video-player {
       flex: 1;
       position: relative;
-      background: #000;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: #000;
     }
 
     .video-player video {
@@ -212,59 +174,52 @@
       object-fit: contain;
     }
 
-    .video-player iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    .video-overlay {
+    .overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.5) 100%);
+      background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.6) 100%);
       pointer-events: none;
     }
 
-    .video-controls {
+    .controls-right {
       position: absolute;
-      right: 15px;
-      bottom: 80px;
+      right: 16px;
+      bottom: 100px;
       z-index: 20;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
     }
 
-    .control-btn {
+    .ctrl-btn {
       width: 50px;
       height: 50px;
-      background: rgba(0,0,0,0.5);
-      border: none;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 50%;
       color: white;
-      font-size: 1.4rem;
-      cursor: pointer;
+      font-size: 1.5rem;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
       transition: all 0.25s;
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.2);
     }
 
-    .control-btn:hover {
-      background: rgba(255, 0, 80, 0.7);
+    .ctrl-btn:hover {
+      background: rgba(255, 0, 80, 0.6);
       transform: scale(1.1);
     }
 
-    .control-btn.active {
+    .ctrl-btn.active {
       background: var(--primary);
-      box-shadow: var(--glow-primary);
+      box-shadow: 0 0 20px rgba(255, 0, 80, 0.5);
     }
 
     .video-info {
       padding: 20px;
-      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.8) 100%);
+      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.95) 100%);
       position: absolute;
       bottom: 0;
       left: 0;
@@ -272,7 +227,7 @@
       z-index: 10;
     }
 
-    .channel-row {
+    .creator-section {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -289,21 +244,21 @@
       align-items: center;
       justify-content: center;
       font-weight: 900;
-      font-size: 1rem;
       border: 2px solid var(--secondary);
+      flex-shrink: 0;
     }
 
-    .channel-info {
+    .creator-info {
       flex: 1;
     }
 
-    .channel-name {
+    .creator-name {
       font-weight: 700;
       font-size: 0.95rem;
       margin-bottom: 2px;
     }
 
-    .channel-meta {
+    .creator-meta {
       font-size: 0.75rem;
       color: var(--text-dim);
     }
@@ -315,17 +270,21 @@
       padding: 8px 16px;
       border-radius: 18px;
       font-weight: 700;
-      cursor: pointer;
       font-size: 0.8rem;
+      cursor: pointer;
       transition: all 0.25s;
     }
 
     .follow-btn:hover {
       transform: translateY(-2px);
-      box-shadow: var(--glow-primary);
     }
 
-    .video-desc {
+    .follow-btn.followed {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--secondary);
+    }
+
+    .video-title {
       font-size: 0.95rem;
       line-height: 1.4;
       margin-bottom: 12px;
@@ -335,14 +294,15 @@
       overflow: hidden;
     }
 
-    .engagement-row {
+    .bottom-actions {
       display: flex;
       justify-content: space-around;
       padding-top: 12px;
-      border-top: 1px solid rgba(255,255,255,0.1);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 12px;
     }
 
-    .engage-btn {
+    .action-btn {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -352,28 +312,23 @@
       font-size: 0.8rem;
       transition: all 0.25s;
       flex: 1;
-      padding: 8px;
     }
 
-    .engage-btn:hover {
+    .action-btn:hover {
       color: var(--secondary);
     }
 
-    .engage-icon {
+    .action-icon {
       font-size: 1.3rem;
     }
 
-    .engage-btn.active .engage-icon {
+    .action-btn.liked .action-icon {
       color: var(--primary);
-      animation: pulse 0.4s;
+      animation: heartBeat 0.4s;
     }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-    }
+    @keyframes heartBeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
 
-    /* ===== SIDEBAR RIGHT ===== */
     .sidebar-right {
       display: flex;
       flex-direction: column;
@@ -391,12 +346,6 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      transition: all 0.25s;
-    }
-
-    .search-box:focus-within {
-      border-color: var(--secondary);
-      box-shadow: var(--glow-secondary);
     }
 
     .search-box input {
@@ -413,36 +362,33 @@
       color: var(--text-dim);
     }
 
-    .source-selector {
+    .filters {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
     }
 
-    .source-btn {
+    .filter-btn {
       background: var(--card);
-      border: 1.5px solid var(--border);
+      border: 1px solid var(--border);
       color: var(--text);
       padding: 10px;
       border-radius: 10px;
       cursor: pointer;
-      transition: all 0.25s;
       font-size: 0.85rem;
       font-weight: 600;
-      text-align: center;
+      transition: all 0.25s;
       font-family: 'Cairo', sans-serif;
     }
 
-    .source-btn:hover {
+    .filter-btn:hover {
       border-color: var(--secondary);
       background: rgba(0, 247, 239, 0.08);
     }
 
-    .source-btn.active {
+    .filter-btn.active {
       background: linear-gradient(135deg, var(--primary), rgba(255, 0, 80, 0.5));
       border-color: var(--primary);
-      color: var(--text);
-      box-shadow: var(--glow-primary);
     }
 
     .card {
@@ -461,13 +407,18 @@
       text-transform: uppercase;
     }
 
+    .trending-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
     .trending-item {
       padding: 8px;
       border-radius: 8px;
       cursor: pointer;
-      transition: all 0.25s;
-      margin-bottom: 8px;
       background: rgba(255,255,255,0.02);
+      transition: all 0.25s;
     }
 
     .trending-item:hover {
@@ -477,9 +428,9 @@
 
     .trending-tag {
       font-weight: 700;
-      font-size: 0.9rem;
       color: var(--secondary);
       margin-bottom: 3px;
+      font-size: 0.9rem;
     }
 
     .trending-count {
@@ -487,181 +438,75 @@
       color: var(--text-dim);
     }
 
-    /* ===== MODAL ===== */
-    #sourceModal {
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      background: rgba(0, 0, 0, 0.95);
+    .no-videos {
+      height: 100%;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(10px);
-    }
-
-    #sourceModal.hidden {
-      display: none;
-    }
-
-    .modal-box {
-      background: linear-gradient(135deg, var(--dark), rgba(20, 30, 60, 0.8));
-      border: 1.5px solid var(--border);
-      border-radius: 20px;
-      padding: 30px;
-      max-width: 420px;
-      width: 90%;
-      box-shadow: 0 0 60px rgba(255, 0, 80, 0.2);
+      gap: 15px;
       text-align: center;
+      color: var(--text-dim);
     }
 
-    .modal-title {
-      font-size: 1.5rem;
-      font-weight: 900;
-      margin-bottom: 20px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .sources-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 15px;
-    }
-
-    .source-option {
-      background: var(--card);
-      border: 1.5px solid var(--border);
-      padding: 15px;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-size: 1.5rem;
-      margin-bottom: 8px;
-    }
-
-    .source-option:hover {
-      border-color: var(--secondary);
-      background: rgba(0, 247, 239, 0.1);
-      transform: translateY(-3px);
-    }
-
-    .source-label {
-      font-size: 0.85rem;
-      color: var(--text);
-      font-weight: 700;
-    }
-
-    /* ===== MOBILE ===== */
     @media (max-width: 1024px) {
-      .main-grid {
-        grid-template-columns: 65px 1fr 0;
-      }
-      .sidebar-right {
-        display: none;
-      }
+      .app { grid-template-columns: 65px 1fr 0; }
+      .sidebar-right { display: none; }
     }
 
     @media (max-width: 768px) {
-      .main-grid {
-        grid-template-columns: 1fr;
-        padding: 0;
-        gap: 0;
-      }
-      .sidebar-left {
-        display: none;
-      }
-      .video-item {
-        border-radius: 0;
-        margin-bottom: 0;
-        min-height: 100vh;
-      }
+      .app { grid-template-columns: 1fr; padding: 0; gap: 0; }
+      .sidebar-left { display: none; }
+      .video-post { border-radius: 0; min-height: 100vh; }
     }
   </style>
 </head>
 <body>
 
-<canvas id="bg-canvas"></canvas>
+<canvas id="bg"></canvas>
 
-<!-- LOADING -->
 <div id="loading">
-  <div class="loader-dot">
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-  </div>
-  <div class="loader-text">VIRAL PRIME</div>
+  <div class="spinner"></div>
+  <div style="color: var(--secondary); font-weight: 900; letter-spacing: 2px;">VIRAL PRIME</div>
 </div>
 
-<!-- SOURCE MODAL -->
-<div id="sourceModal">
-  <div class="modal-box">
-    <div class="modal-title">اختار مصدر الفيديوهات</div>
-    <div class="sources-grid">
-      <div class="source-option" onclick="selectSource('tiktok')">
-        <div>🎵</div>
-        <div class="source-label">TikTok</div>
-      </div>
-      <div class="source-option" onclick="selectSource('youtube')">
-        <div>📺</div>
-        <div class="source-label">YouTube</div>
-      </div>
-      <div class="source-option" onclick="selectSource('facebook')">
-        <div>👍</div>
-        <div class="source-label">Facebook</div>
-      </div>
-      <div class="source-option" onclick="selectSource('instagram')">
-        <div>📸</div>
-        <div class="source-label">Instagram</div>
-      </div>
-    </div>
-  </div>
-</div>
+<div class="app">
 
-<!-- MAIN -->
-<div class="main-grid">
-
-  <!-- LEFT SIDEBAR -->
   <div class="sidebar-left">
-    <div class="logo" onclick="location.reload()">🎥</div>
-    <div class="nav-btn active" onclick="switchNav(event, 'home')">🏠</div>
-    <div class="nav-btn" onclick="switchNav(event, 'trending')">🔥</div>
-    <div class="nav-btn" onclick="switchNav(event, 'music')">🎵</div>
-    <div class="nav-btn" onclick="switchNav(event, 'comedy')">😂</div>
-    <div class="nav-btn" onclick="switchNav(event, 'gaming')">🎮</div>
+    <button class="logo-btn" onclick="location.reload()">🎥</button>
+    <div class="nav-item active" onclick="switchNav(event, 'all')">🏠</div>
+    <div class="nav-item" onclick="switchNav(event, 'trending')">🔥</div>
+    <div class="nav-item" onclick="switchNav(event, 'music')">🎵</div>
+    <div class="nav-item" onclick="switchNav(event, 'comedy')">😂</div>
   </div>
 
-  <!-- FEED CENTER -->
   <div id="feed"></div>
 
-  <!-- RIGHT SIDEBAR -->
   <div class="sidebar-right">
     <div class="search-box">
       <span>🔍</span>
-      <input type="text" placeholder="ابحث..." onkeyup="searchVideos(this.value)">
+      <input type="text" id="searchInput" placeholder="ابحث..." onkeyup="searchVideos(this.value)">
     </div>
 
-    <div>
-      <div style="font-size: 0.8rem; font-weight: 900; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase;">المصدر</div>
-      <div class="source-selector">
-        <div class="source-btn active" onclick="changeSource('tiktok', event)">🎵 TikTok</div>
-        <div class="source-btn" onclick="changeSource('youtube', event)">📺 YouTube</div>
-        <div class="source-btn" onclick="changeSource('facebook', event)">👍 Facebook</div>
-        <div class="source-btn" onclick="changeSource('instagram', event)">📸 Instagram</div>
-      </div>
+    <div class="filters">
+      <div class="filter-btn active" onclick="filterCategory(event, 'all')">الكل</div>
+      <div class="filter-btn" onclick="filterCategory(event, 'music')">🎵 موسيقى</div>
+      <div class="filter-btn" onclick="filterCategory(event, 'comedy')">😂 فكاهة</div>
+      <div class="filter-btn" onclick="filterCategory(event, 'trending')">🔥 مشهور</div>
     </div>
 
     <div class="card">
-      <div class="card-title">🔥 الأكثر مشاهدة</div>
-      <div id="trending"></div>
+      <div class="card-title">🔥 الآن</div>
+      <div class="trending-list" id="trending"></div>
     </div>
 
     <div class="card">
-      <div class="card-title">⚙️ خيارات</div>
-      <div style="font-size: 0.9rem; color: var(--text-dim); line-height: 1.5;">
-        <div style="padding: 8px; margin-bottom: 8px; background: rgba(0,247,239,0.05); border-radius: 8px; cursor: pointer;" onclick="toggleAutoplay()">▶️ تشغيل تلقائي</div>
-        <div style="padding: 8px; background: rgba(0,247,239,0.05); border-radius: 8px; cursor: pointer;" onclick="toggleSound()">🔊 الصوت</div>
+      <div class="card-title">📊 الإحصائيات</div>
+      <div style="font-size: 0.9rem; color: var(--text-dim); line-height: 1.8;">
+        <div>📹 الفيديوهات: <span style="color: var(--secondary);" id="total">0</span></div>
+        <div>❤️ الإعجابات: <span style="color: var(--primary);" id="likes">0</span></div>
+        <div>⏱️ المشاهدة: <span style="color: var(--tertiary);" id="time">0 ث</span></div>
+        <div>👥 المتابعون: <span style="color: var(--secondary);" id="followers">0</span></div>
       </div>
     </div>
   </div>
@@ -669,76 +514,102 @@
 </div>
 
 <script>
-// ===== CONFIG =====
-const VIDEOS_DATA = [
-  // TikTok Videos (embed codes)
-  { id: 1, source: 'tiktok', title: 'فيديو تيك توك رائع', channel: 'Creator 1', avatar: 'C', link: 'https://www.tiktok.com/@creator1/video/1234567890' },
-  { id: 2, source: 'youtube', title: 'فيديو يوتيوب مميز', channel: 'Creator 2', avatar: 'C', videoId: 'dQw4w9WgXcQ' },
-  { id: 3, source: 'tiktok', title: 'فيديو تيك توك مضحك', channel: 'Creator 3', avatar: 'C', link: 'https://www.tiktok.com/@creator3/video/1234567891' },
-  { id: 4, source: 'facebook', title: 'فيديو فيس بوك جميل', channel: 'Creator 4', avatar: 'C', fbLink: 'https://www.facebook.com/watch/?v=1234567890' },
-  { id: 5, source: 'instagram', title: 'فيديو إنستجرام رايق', channel: 'Creator 5', avatar: 'C', igLink: 'https://www.instagram.com/reel/ABC123/' },
-  { id: 6, source: 'youtube', title: 'فيديو يوتيوب آخر', channel: 'Creator 6', avatar: 'C', videoId: 'jNQXAC9IVRw' },
-  { id: 7, source: 'tiktok', title: 'فيديو تيك توك موسيقي', channel: 'Creator 7', avatar: 'C', link: 'https://www.tiktok.com/@creator7/video/1234567892' },
-  { id: 8, source: 'youtube', title: 'فيديو يوتيوب تعليمي', channel: 'Creator 8', avatar: 'C', videoId: '9bZkp7q19f0' },
+// ===== VIDEOS DATABASE =====
+const VIDEOS = [
+  {
+    id: 1,
+    title: "منظر طبيعي ساحر - شروق الشمس على الجبال 🏔️",
+    channel: "Nature Films",
+    category: "trending",
+    url: "https://videos.pexels.com/video-files/3571937/3571937-sd_640_360_30fps.mp4"
+  },
+  {
+    id: 2,
+    title: "موسيقى هادئة مع طبيعة خضراء 🌿",
+    channel: "Chill Vibes",
+    category: "music",
+    url: "https://videos.pexels.com/video-files/3217788/3217788-sd_640_360_30fps.mp4"
+  },
+  {
+    id: 3,
+    title: "حيوانات ظريفة تلعب - فيديو مضحك 😂",
+    channel: "Funny Pets",
+    category: "comedy",
+    url: "https://videos.pexels.com/video-files/5573881/5573881-sd_640_360_30fps.mp4"
+  },
+  {
+    id: 4,
+    title: "محيط هادئ وموجات جميلة 🌊",
+    channel: "Ocean Dreams",
+    category: "trending",
+    url: "https://videos.pexels.com/video-files/7991196/7991196-sd_640_360_25fps.mp4"
+  },
+  {
+    id: 5,
+    title: "غابة ضبابية - مناظر طبيعية خلابة 🌲",
+    channel: "Wild Nature",
+    category: "trending",
+    url: "https://videos.pexels.com/video-files/2398220/2398220-sd_640_360_30fps.mp4"
+  },
+  {
+    id: 6,
+    title: "قطط لطيفة تلعب - محتوى طريف 😹",
+    channel: "Cat Lovers",
+    category: "comedy",
+    url: "https://videos.pexels.com/video-files/2603537/2603537-sd_640_360_30fps.mp4"
+  }
 ];
 
 // ===== STATE =====
-let currentSource = 'tiktok';
-let currentIndex = 0;
-let filteredVideos = VIDEOS_DATA.filter(v => v.source === 'tiktok');
-let autoplay = true;
-let soundOn = true;
-let currentAudio = null;
+let currentLikes = {};
+let stats = { likes: 0, watchTime: 0, followers: 0, totalLikes: 0 };
+let currentCategory = 'all';
+let currentPlayingVideo = null;
+let watchTimers = {};
+let followed = {};
 
-// ===== INIT =====
 window.addEventListener('load', () => {
   initCanvas();
   setTimeout(() => {
     document.getElementById('loading').classList.add('hidden');
-    loadFeed();
+    document.getElementById('total').textContent = VIDEOS.length;
+    renderFeed();
     updateTrending();
-  }, 800);
+  }, 1000);
 });
 
-// ===== CANVAS BG =====
 function initCanvas() {
-  const canvas = document.getElementById('bg-canvas');
+  const canvas = document.getElementById('bg');
   const ctx = canvas.getContext('2d');
-  let w, h, particles = [];
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  let particles = [];
 
-  function resize() {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  for(let i = 0; i < 80; i++) {
+  for(let i = 0; i < 50; i++) {
     particles.push({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      r: Math.random() * 1.5 + 0.5,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5,
+      vx: (Math.random() - 0.5) * 0.2,
+      vy: (Math.random() - 0.5) * 0.2,
       a: Math.random() * 0.5
     });
   }
 
   function draw() {
     ctx.fillStyle = 'rgba(10, 14, 39, 0.05)';
-    ctx.fillRect(0, 0, w, h);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     particles.forEach(p => {
       p.x += p.vx;
       p.y += p.vy;
       p.a += 0.01;
+      if(p.x < 0) p.x = canvas.width;
+      if(p.x > canvas.width) p.x = 0;
+      if(p.y < 0) p.y = canvas.height;
+      if(p.y > canvas.height) p.y = 0;
 
-      if(p.x < 0) p.x = w;
-      if(p.x > w) p.x = 0;
-      if(p.y < 0) p.y = h;
-      if(p.y > h) p.y = 0;
-
-      const alpha = 0.3 + 0.2 * Math.abs(Math.sin(p.a));
+      const alpha = 0.3 + 0.2 * Math.sin(p.a);
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(0, 247, 239, ${alpha})`;
@@ -750,207 +621,295 @@ function initCanvas() {
   draw();
 }
 
-// ===== LOAD FEED =====
-function loadFeed() {
+function renderFeed() {
   const feed = document.getElementById('feed');
   feed.innerHTML = '';
 
-  filteredVideos.forEach((video, idx) => {
-    const item = document.createElement('div');
-    item.className = 'video-item';
-    
-    let playerHTML = '';
-    if(video.source === 'youtube' && video.videoId) {
-      playerHTML = `<iframe src="https://www.youtube.com/embed/${video.videoId}?modestbranding=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-    } else if(video.source === 'tiktok') {
-      playerHTML = `<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #000; flex-direction: column; color: #fff; gap: 15px;">
-        <div style="font-size: 3rem;">🎵</div>
-        <div style="text-align: center;">
-          <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;">فيديو TikTok</div>
-          <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 15px;">اضغط للفتح على TikTok</div>
-          <a href="${video.link}" target="_blank" style="background: linear-gradient(135deg, #ff0050, #ff006e); color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: 700; display: inline-block;">فتح الفيديو</a>
-        </div>
-      </div>`;
-    } else if(video.source === 'facebook') {
-      playerHTML = `<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #000; flex-direction: column; color: #fff; gap: 15px;">
-        <div style="font-size: 3rem;">👍</div>
-        <div style="text-align: center;">
-          <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;">فيديو Facebook</div>
-          <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 15px;">اضغط للفتح على Facebook</div>
-          <a href="${video.fbLink}" target="_blank" style="background: #1877f2; color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: 700; display: inline-block;">فتح الفيديو</a>
-        </div>
-      </div>`;
-    } else if(video.source === 'instagram') {
-      playerHTML = `<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #000; flex-direction: column; color: #fff; gap: 15px;">
-        <div style="font-size: 3rem;">📸</div>
-        <div style="text-align: center;">
-          <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;">فيديو Instagram</div>
-          <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 15px;">اضغط للفتح على Instagram</div>
-          <a href="${video.igLink}" target="_blank" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: 700; display: inline-block;">فتح الفيديو</a>
-        </div>
-      </div>`;
-    }
+  const filtered = currentCategory === 'all' 
+    ? VIDEOS 
+    : VIDEOS.filter(v => v.category === currentCategory);
 
-    item.innerHTML = `
+  if(filtered.length === 0) {
+    feed.innerHTML = '<div class="no-videos"><div style="font-size: 3rem;">📭</div>لا توجد فيديوهات</div>';
+    return;
+  }
+
+  filtered.forEach(video => {
+    const post = document.createElement('div');
+    post.className = 'video-post';
+    const liked = currentLikes[video.id] || false;
+    const isMuted = localStorage.getItem('soundOff') === 'true';
+
+    post.innerHTML = `
       <div class="video-player">
-        ${playerHTML}
-        <div class="video-overlay"></div>
-        <div class="video-controls">
-          <button class="control-btn" onclick="toggleLike(this)">❤️</button>
-          <button class="control-btn" onclick="shareVideo('${video.title}')">📤</button>
-          <button class="control-btn" onclick="bookmarkVideo(this)">🔖</button>
-          <button class="control-btn" onclick="toggleMute(this)">🔊</button>
-        </div>
-        <div class="video-info">
-          <div class="channel-row">
-            <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-              <div class="avatar">${video.avatar}</div>
-              <div class="channel-info">
-                <div class="channel-name">${video.channel}</div>
-                <div class="channel-meta">المزيد من الفيديوهات</div>
-              </div>
-            </div>
-            <button class="follow-btn" onclick="follow(this)">متابعة</button>
+        <video 
+          id="vid-${video.id}" 
+          autoplay 
+          muted
+          loop
+          playsinline
+          onplay="startWatchTimer(${video.id})" 
+          onpause="stopWatchTimer(${video.id})"
+          onended="stopWatchTimer(${video.id})">
+          <source src="${video.url}" type="video/mp4">
+        </video>
+        <div class="overlay"></div>
+
+        <div class="controls-right">
+          <div style="text-align: center;">
+            <div class="ctrl-btn ${liked ? 'active' : ''}" onclick="toggleLike(${video.id}, this)">❤️</div>
+            <div style="font-size: 0.65rem; color: white; margin-top: 4px;">إعجاب</div>
           </div>
-          <div class="video-desc">${video.title}</div>
-          <div class="engagement-row">
-            <div class="engage-btn" onclick="engage(this, 'like')"><div class="engage-icon">❤️</div><span>إعجاب</span></div>
-            <div class="engage-btn" onclick="engage(this, 'comment')"><div class="engage-icon">💬</div><span>تعليق</span></div>
-            <div class="engage-btn" onclick="engage(this, 'share')"><div class="engage-icon">📤</div><span>شارك</span></div>
+          <div style="text-align: center;">
+            <div class="ctrl-btn" onclick="shareVideo('${video.title}')">📤</div>
+            <div style="font-size: 0.65rem; color: white; margin-top: 4px;">شارك</div>
+          </div>
+          <div style="text-align: center;">
+            <div class="ctrl-btn" onclick="bookmarkVideo(this)">🔖</div>
+            <div style="font-size: 0.65rem; color: white; margin-top: 4px;">حفظ</div>
+          </div>
+          <div style="text-align: center;">
+            <div class="ctrl-btn ${isMuted ? 'active' : ''}" onclick="toggleSound(this)">🔊</div>
+            <div style="font-size: 0.65rem; color: white; margin-top: 4px;">صوت</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="video-info">
+        <div class="creator-section">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="avatar">${video.channel.charAt(0)}</div>
+            <div class="creator-info">
+              <div class="creator-name">${video.channel}</div>
+              <div class="creator-meta">عضو في المنصة</div>
+            </div>
+          </div>
+          <button class="follow-btn ${followed[video.id] ? 'followed' : ''}" onclick="followChannel(${video.id}, this)">
+            ${followed[video.id] ? '✓ متابع' : 'متابعة'}
+          </button>
+        </div>
+
+        <div class="video-title">${video.title}</div>
+
+        <div class="bottom-actions">
+          <div class="action-btn ${liked ? 'liked' : ''}" onclick="toggleLike(${video.id}, this)">
+            <div class="action-icon">❤️</div>
+            <span>إعجاب</span>
+          </div>
+          <div class="action-btn" onclick="comment()">
+            <div class="action-icon">💬</div>
+            <span>تعليق</span>
+          </div>
+          <div class="action-btn" onclick="shareVideo('${video.title}')">
+            <div class="action-icon">📤</div>
+            <span>شارك</span>
           </div>
         </div>
       </div>
     `;
 
-    feed.appendChild(item);
+    feed.appendChild(post);
   });
 
-  // IntersectionObserver for audio control
+  setupObserver();
+}
+
+function setupObserver() {
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-      const video = entry.target.querySelector('iframe');
+      const video = entry.target.querySelector('video');
+      if(!video) return;
+      
       if(entry.isIntersecting) {
-        // Video is in view - could enable audio
+        if(currentPlayingVideo && currentPlayingVideo !== video) {
+          currentPlayingVideo.pause();
+          currentPlayingVideo.currentTime = 0;
+        }
+        currentPlayingVideo = video;
+        video.play().catch(() => {});
       } else {
-        // Video is out of view - stop all audio
-        if(currentAudio) {
-          currentAudio.pause();
-          currentAudio = null;
+        if(video === currentPlayingVideo) {
+          video.pause();
+          video.currentTime = 0;
+          currentPlayingVideo = null;
         }
       }
     });
   }, { threshold: 0.5 });
 
-  document.querySelectorAll('.video-item').forEach(item => {
-    observer.observe(item);
-  });
+  document.querySelectorAll('.video-post').forEach(p => observer.observe(p));
 }
 
-// ===== INTERACTIONS =====
-function engage(el, type) {
-  el.classList.add('active');
-  setTimeout(() => el.classList.remove('active'), 400);
+// ===== WATCH TIME (CORRECT) =====
+function startWatchTimer(id) {
+  if(watchTimers[id]) return;
+  
+  watchTimers[id] = setInterval(() => {
+    stats.watchTime++;
+    document.getElementById('time').textContent = stats.watchTime + ' ث';
+  }, 1000);
 }
 
-function toggleLike(btn) {
-  btn.classList.toggle('active');
-}
-
-function toggleMute(btn) {
-  btn.classList.toggle('active');
-  soundOn = !soundOn;
-}
-
-function shareVideo(title) {
-  const text = `شاهد هذا الفيديو الرائع: ${title}\n\n🎥 VIRAL PRIME\nhttps://viralprime.com`;
-  if(navigator.share) {
-    navigator.share({title: 'VIRAL PRIME', text}).catch(()=>{});
-  } else {
-    navigator.clipboard.writeText(text);
-    alert('تم نسخ الفيديو!');
+function stopWatchTimer(id) {
+  if(watchTimers[id]) {
+    clearInterval(watchTimers[id]);
+    delete watchTimers[id];
   }
 }
 
-function bookmarkVideo(btn) {
-  btn.classList.toggle('active');
+// ===== LIKE (FIXED) =====
+function toggleLike(id, el) {
+  const wasLiked = currentLikes[id];
+  
+  if(wasLiked) {
+    // Unlike
+    delete currentLikes[id];
+    stats.likes--;
+    stats.totalLikes--;
+    if(el.classList) el.classList.remove('active');
+    else el.closest('.action-btn').classList.remove('liked');
+  } else {
+    // Like
+    currentLikes[id] = true;
+    stats.likes++;
+    stats.totalLikes++;
+    if(el.classList) el.classList.add('active');
+    else el.closest('.action-btn').classList.add('liked');
+  }
+  
+  document.getElementById('likes').textContent = stats.totalLikes;
+  notify(wasLiked ? '💔 تم الإلغاء' : '❤️ تم الإعجاب!');
 }
 
-function follow(btn) {
-  btn.textContent = '✓ متابع';
-  btn.style.opacity = '0.6';
-  setTimeout(() => {
+// ===== SOUND CONTROL =====
+function toggleSound(btn) {
+  const isMuted = localStorage.getItem('soundOff') === 'true';
+  
+  if(isMuted) {
+    localStorage.removeItem('soundOff');
+    btn.classList.remove('active');
+    document.querySelectorAll('video').forEach(v => v.muted = false);
+    notify('🔊 الصوت مفعّل');
+  } else {
+    localStorage.setItem('soundOff', 'true');
+    btn.classList.add('active');
+    document.querySelectorAll('video').forEach(v => v.muted = true);
+    notify('🔇 الصوت معطّل');
+  }
+}
+
+// ===== OTHER ACTIONS =====
+function comment() { notify('💬 أضف تعليقك!'); }
+
+function shareVideo(title) { 
+  if(navigator.share) navigator.share({text: title});
+  else {
+    navigator.clipboard.writeText(title);
+    notify('📤 تم النسخ!');
+  }
+}
+
+function bookmarkVideo(el) { 
+  el.classList.toggle('active');
+  notify('🔖');
+}
+
+function followChannel(id, btn) {
+  followed[id] = !followed[id];
+  
+  if(followed[id]) {
+    btn.textContent = '✓ متابع';
+    btn.classList.add('followed');
+    stats.followers++;
+    document.getElementById('followers').textContent = stats.followers;
+    notify('✓ تمت المتابعة!');
+  } else {
     btn.textContent = 'متابعة';
-    btn.style.opacity = '1';
-  }, 2000);
-}
-
-// ===== SOURCE CONTROL =====
-function changeSource(source, event) {
-  document.querySelectorAll('.source-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  currentSource = source;
-  filteredVideos = VIDEOS_DATA.filter(v => v.source === source);
-  currentIndex = 0;
-  loadFeed();
-  updateTrending();
-}
-
-function selectSource(source) {
-  currentSource = source;
-  filteredVideos = VIDEOS_DATA.filter(v => v.source === source);
-  document.getElementById('sourceModal').classList.add('hidden');
-  loadFeed();
-}
-
-// ===== SEARCH =====
-function searchVideos(query) {
-  if(query.length < 2) {
-    filteredVideos = VIDEOS_DATA.filter(v => v.source === currentSource);
-  } else {
-    filteredVideos = VIDEOS_DATA.filter(v => 
-      v.source === currentSource && 
-      (v.title.includes(query) || v.channel.includes(query))
-    );
+    btn.classList.remove('followed');
+    stats.followers--;
+    document.getElementById('followers').textContent = stats.followers;
+    notify('💔 تم إلغاء المتابعة');
   }
-  loadFeed();
 }
 
 // ===== NAVIGATION =====
-function switchNav(event, type) {
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  // Filter by category
-  loadFeed();
+function switchNav(e, cat) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  e.target.classList.add('active');
+  currentCategory = cat;
+  document.getElementById('searchInput').value = '';
+  renderFeed();
 }
 
-// ===== TRENDING =====
+function filterCategory(e, cat) {
+  document.querySelectorAll('.filter-btn').forEach(f => f.classList.remove('active'));
+  e.target.classList.add('active');
+  currentCategory = cat;
+  document.getElementById('searchInput').value = '';
+  renderFeed();
+}
+
+// ===== SMART SEARCH (CASE INSENSITIVE) =====
+function searchVideos(q) {
+  if(q.length < 1) { 
+    document.getElementById('searchInput').value = '';
+    renderFeed(); 
+    return; 
+  }
+  
+  const feed = document.getElementById('feed');
+  const query = q.toLowerCase().trim();
+  
+  const filtered = VIDEOS.filter(v => 
+    v.title.toLowerCase().includes(query) || 
+    v.channel.toLowerCase().includes(query) ||
+    v.category.toLowerCase().includes(query)
+  );
+  
+  if(!filtered.length) {
+    feed.innerHTML = '<div class="no-videos"><div style="font-size: 3rem;">🔍</div>لا توجد نتائج</div>';
+    return;
+  }
+
+  feed.innerHTML = '';
+  filtered.forEach(v => {
+    const div = document.createElement('div');
+    div.innerHTML = `<div style="padding: 10px; background: var(--card); border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid var(--border); font-weight: 700;">${v.title}</div>`;
+    div.onclick = () => { 
+      currentCategory = v.category; 
+      document.getElementById('searchInput').value = '';
+      renderFeed(); 
+    };
+    feed.appendChild(div);
+  });
+}
+
 function updateTrending() {
   const trending = [
     { tag: '#فيديوهات_حصرية', count: '450K' },
     { tag: '#محتوى_طازج', count: '320K' },
-    { tag: '#أكثر_مشاهدة', count: '680K' },
-    { tag: '#فيديو_اليوم', count: '250K' },
+    { tag: '#أكثر_مشاهدة', count: '680K' }
   ];
 
-  const trendingDiv = document.getElementById('trending');
-  trendingDiv.innerHTML = trending.map(t => `
-    <div class="trending-item" onclick="searchVideos('${t.tag}')">
+  document.getElementById('trending').innerHTML = trending.map(t => `
+    <div class="trending-item">
       <div class="trending-tag">${t.tag}</div>
       <div class="trending-count">${t.count} مشاهدة</div>
     </div>
   `).join('');
 }
 
-// ===== OPTIONS =====
-function toggleAutoplay() {
-  autoplay = !autoplay;
-  alert(autoplay ? '▶️ التشغيل التلقائي مفعّل' : '⏸️ التشغيل التلقائي معطّل');
+function notify(emoji) {
+  const n = document.createElement('div');
+  n.style.cssText = `position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 12px 20px; border-radius: 12px; z-index: 5000; animation: slideIn 0.3s ease; font-weight: 700;`;
+  n.textContent = emoji;
+  document.body.appendChild(n);
+  setTimeout(() => n.remove(), 1500);
 }
 
-function toggleSound() {
-  soundOn = !soundOn;
-  alert(soundOn ? '🔊 الصوت مفعّل' : '🔇 الصوت معطّل');
-}
+const style = document.createElement('style');
+style.textContent = '@keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }';
+document.head.appendChild(style);
 </script>
 
 </body>
